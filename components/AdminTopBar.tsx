@@ -51,14 +51,14 @@ export default function AdminTopBar() {
     <header
       className="fixed top-0 left-0 right-0 z-40 md:hidden"
       style={{
-        background: "rgba(11,11,15,0.95)",
-        borderBottom: "1px solid #1E1E2A",
-        backdropFilter: "blur(12px)",
-        WebkitBackdropFilter: "blur(12px)",
+        background: "rgba(14,14,22,0.94)",
+        borderBottom: "1px solid #1A1A28",
+        backdropFilter: "blur(16px)",
+        WebkitBackdropFilter: "blur(16px)",
       }}
     >
       {selectedClient && (
-        <div className="flex items-center gap-3 px-4 pt-2.5 pb-1.5" style={{ borderBottom: "1px solid #1E1E2A" }}>
+        <div className="flex items-center gap-3 px-4 pt-2.5 pb-1.5" style={{ borderBottom: "1px solid #1A1A28" }}>
           <button onClick={handleDeselect} className="flex items-center gap-1.5 flex-shrink-0">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
             <span className="text-xs" style={{ color: "#6B7280" }}>Todos</span>
