@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: authError?.message ?? "Erro ao criar usuário." }, { status: 400 });
   }
 
-  const { error: profileError } = await supabase.from("profiles").insert({
+  const { error: profileError } = await supabase.from("profiles").upsert({
     id: authData.user.id,
     role: "client",
     name,
@@ -39,10 +39,9 @@ export async function POST(req: NextRequest) {
     growth: 0,
     warmth_score: 0,
     briefing_completed: false,
-  });
+  }, { onConflict: "id" });
 
   if (profileError) {
-    // Clean up the auth user if profile insert fails
     await supabase.auth.admin.deleteUser(authData.user.id);
     return NextResponse.json({ error: profileError.message }, { status: 500 });
   }

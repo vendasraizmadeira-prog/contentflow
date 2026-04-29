@@ -199,7 +199,7 @@ export default function AdminCalendario() {
 
       {showModal && selectedDay && (
         <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center" style={{ background: "rgba(0,0,0,0.85)" }}>
-          <div className="w-full md:max-w-sm rounded-t-3xl md:rounded-2xl p-6" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
+          <div className="w-full md:max-w-sm rounded-t-3xl md:rounded-2xl p-6 pb-28 md:pb-6" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
             <div className="w-10 h-1 rounded-full mx-auto mb-4 md:hidden" style={{ background: "#2A2A38" }} />
             <h3 className="font-bold text-lg mb-1">Agendar evento</h3>
             <p className="text-xs mb-5" style={{ color: "#7B4DFF" }}>{formatDate(selectedDay)}</p>

@@ -315,7 +315,7 @@ export default function ReelsPage() {
       {/* Modal */}
       {showChange && (
         <div className="fixed inset-0 flex items-end md:items-center justify-center z-50" style={{ background: "rgba(0,0,0,0.8)" }}>
-          <div className="w-full md:max-w-md rounded-t-3xl md:rounded-2xl p-6" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
+          <div className="w-full md:max-w-md rounded-t-3xl md:rounded-2xl p-6 pb-28 md:pb-6" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
             <h3 className="font-bold mb-4">Solicitar alteração</h3>
             <textarea value={changeText} onChange={(e) => setChangeText(e.target.value)} placeholder="Descreva o que precisa mudar..." rows={4} className="w-full px-3 py-2.5 rounded-2xl text-sm resize-none outline-none mb-4" style={{ background: "#0B0B0F", border: "1px solid #2A2A38", color: "#fff" }} />
             <div className="flex gap-3">

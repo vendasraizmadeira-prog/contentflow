@@ -123,7 +123,7 @@ export default function Clientes() {
       {/* New client modal */}
       {showNew && (
         <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center" style={{ background: "rgba(0,0,0,0.85)" }}>
-          <div className="w-full md:max-w-md rounded-t-3xl md:rounded-2xl p-6 max-h-[92vh] overflow-y-auto" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
+          <div className="w-full md:max-w-md rounded-t-3xl md:rounded-2xl p-6 pb-28 md:pb-6 max-h-[92vh] overflow-y-auto" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
             <div className="w-10 h-1 rounded-full mx-auto mb-5 md:hidden" style={{ background: "#2A2A38" }} />
             <h3 className="font-bold text-lg mb-0.5">Nova Conta</h3>
             <p className="text-xs mb-5" style={{ color: "#6B7280" }}>

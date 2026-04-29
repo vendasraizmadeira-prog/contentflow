@@ -255,7 +255,7 @@ export default function PostPage() {
       {/* Modal alteração */}
       {showModal && (
         <div className="fixed inset-0 flex items-end md:items-center justify-center z-50" style={{ background: "rgba(0,0,0,0.8)" }}>
-          <div className="w-full md:max-w-md rounded-t-3xl md:rounded-2xl p-6" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
+          <div className="w-full md:max-w-md rounded-t-3xl md:rounded-2xl p-6 pb-28 md:pb-6" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
             <h3 className="font-bold mb-1">Solicitar alteração</h3>
             <p className="text-sm mb-4" style={{ color: "#6B7280" }}>Descreva o que precisa ser alterado</p>
             <textarea value={changeNote} onChange={(e) => setChangeNote(e.target.value)} placeholder="Ex: Trocar a cor do fundo, ajustar o texto..." rows={4} className="w-full px-3 py-2.5 rounded-2xl text-sm resize-none outline-none mb-4" style={{ background: "#0B0B0F", border: "1px solid #2A2A38", color: "#fff" }} />
