@@ -38,7 +38,7 @@ function LoginForm() {
     } else if (profile?.briefing_completed === false) {
       router.push("/briefing");
     } else {
-      router.push("/metricas");
+      router.push("/dashboard");
     }
   };
 

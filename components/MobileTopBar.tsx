@@ -5,35 +5,36 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
-const pageTitles: Record<string, string> = {
-  "/metricas":     "Dashboard",
-  "/roteiros":     "Roteiros",
+const titles: Record<string, string> = {
+  "/dashboard":    "Início",
   "/conteudos":    "Conteúdos",
-  "/posts":        "Posts",
-  "/reels":        "Reels",
+  "/roteiros":     "Roteiros",
   "/calendario":   "Calendário",
+  "/metricas":     "Meu Perfil",
   "/ideias":       "Ideias & Refs",
   "/notificacoes": "Notificações",
   "/briefing":     "Briefing",
+  "/posts":        "Posts",
+  "/reels":        "Reels",
 };
 
-function getPageTitle(pathname: string): string {
-  if (pageTitles[pathname]) return pageTitles[pathname];
-  for (const [key, value] of Object.entries(pageTitles)) {
-    if (pathname.startsWith(key + "/")) return value;
+function getTitle(p: string) {
+  if (titles[p]) return titles[p];
+  for (const [key, val] of Object.entries(titles)) {
+    if (p.startsWith(key + "/")) return val;
   }
-  if (pathname.startsWith("/post/")) return "Post";
-  if (pathname.startsWith("/reels/")) return "Reel";
-  return "ContentFlow";
+  if (p.startsWith("/post/")) return "Conteúdo";
+  return null;
 }
 
 export default function MobileTopBar() {
-  const pathname = usePathname();
+  const pathname = usePathname() ?? "";
   const [unread, setUnread] = useState(0);
-  const isHomePage = pathname === "/metricas";
+  const title = getTitle(pathname);
+  const isHome = pathname === "/dashboard";
 
   useEffect(() => {
-    const load = async () => {
+    (async () => {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
@@ -43,33 +44,32 @@ export default function MobileTopBar() {
         .eq("user_id", user.id)
         .eq("read", false);
       setUnread(count ?? 0);
-    };
-    load();
+    })();
   }, []);
 
   return (
     <header
       className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 md:hidden"
       style={{
-        background: "rgba(14,14,22,0.92)",
-        borderBottom: "1px solid #1A1A28",
-        height: 52,
-        backdropFilter: "blur(16px)",
-        WebkitBackdropFilter: "blur(16px)",
+        background: "rgba(12,12,24,0.94)",
+        borderBottom: "1px solid #17172A",
+        height: 50,
+        backdropFilter: "blur(20px)",
+        WebkitBackdropFilter: "blur(20px)",
       }}
     >
-      {isHomePage ? (
-        <Logo size={24} />
+      {isHome ? (
+        <Logo size={22} />
       ) : (
-        <p className="font-bold text-base" style={{ color: "#fff" }}>{getPageTitle(pathname ?? "")}</p>
+        <p className="font-bold text-[15px] tracking-tight">{title}</p>
       )}
 
       <Link href="/notificacoes">
         <div
-          className="relative w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer transition-all duration-150"
-          style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}
+          className="relative w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer"
+          style={{ background: "#13132A", border: "1px solid #22223A" }}
         >
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#7A7A9A" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
             <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
           </svg>
           {unread > 0 && (

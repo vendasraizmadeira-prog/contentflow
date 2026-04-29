@@ -180,7 +180,7 @@ export default function Metricas() {
             <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: "#2A2A38" }}>
               <div className="h-2 rounded-full" style={{ width: `${warmthScore}%`, background: "linear-gradient(90deg, #4B5563 10%, #D4FF3F 100%)" }} />
             </div>
-            <span className="text-xs font-bold" style={{ color: "#D4FF3F" }}>🔥 {warmthScore}%</span>
+            <span className="text-xs font-bold" style={{ color: "#D4FF3F" }}>{warmthScore}%</span>
           </div>
         </div>
 
@@ -266,7 +266,7 @@ export default function Metricas() {
             <div className="rounded-2xl p-4" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
               <div className="flex justify-between items-center mb-3">
                 <p className="font-semibold text-sm">Status do Perfil</p>
-                <span className="text-xl">🔥</span>
+                <span className="text-sm font-bold" style={{ color: "#D4FF3F" }}>{warmthScore}%</span>
               </div>
               <div className="flex items-center gap-3 mb-3">
                 <span className="text-3xl font-bold">{warmthScore}%</span>
@@ -285,7 +285,7 @@ export default function Metricas() {
       {/* ═══════════ DESKTOP ═══════════ */}
       <div className="hidden md:block p-6 max-w-4xl">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold">Métricas</h1>
+          <h1 className="text-2xl font-bold">Meu Perfil</h1>
           <p className="text-sm mt-0.5" style={{ color: "#6B7280" }}>Acompanhe o crescimento do seu perfil</p>
         </div>
 
@@ -361,8 +361,7 @@ export default function Metricas() {
 
         <div className="rounded-2xl p-5" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
           <div className="flex justify-between items-start mb-3">
-            <h3 className="font-semibold">Status do Perfil</h3>
-            <span className="text-2xl">🔥</span>
+            <h3 className="font-semibold">Perfil Aquecido</h3>
           </div>
           <div className="flex items-center gap-4 mb-3">
             <span className="text-3xl font-bold">{warmthScore}%</span>

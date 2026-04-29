@@ -34,7 +34,7 @@ export default function AdminSidebar() {
   const initials = adminName.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase();
 
   return (
-    <aside className="hidden md:flex flex-col w-60 min-h-screen flex-shrink-0" style={{ background: "#0E0E16", borderRight: "1px solid #1A1A28" }}>
+    <aside className="hidden md:flex flex-col w-56 min-h-screen flex-shrink-0" style={{ background: "#0C0C18", borderRight: "1px solid #17172A" }}>
       <div className="px-4 pt-5 pb-4">
         <Logo size={28} />
         <p className="text-xs mt-1.5 ml-1 font-semibold" style={{ color: "#7B4DFF" }}>Painel Admin</p>
@@ -65,7 +65,7 @@ export default function AdminSidebar() {
         })}
       </nav>
 
-      <div className="p-3" style={{ borderTop: "1px solid #1A1A28" }}>
+      <div className="p-2.5" style={{ borderTop: "1px solid #17172A" }}>
         <Link href="/logout">
           <div
             className="flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-150"

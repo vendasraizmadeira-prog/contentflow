@@ -1,19 +1,35 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0B0B0F;
-  --foreground: #ffffff;
-  --neon: #D4FF3F;
-  --purple: #7B4DFF;
-  --card: #1A1A22;
-  --card-hover: #22222E;
-  --border: #2A2A38;
-  --muted: #6B7280;
-  --muted-foreground: #9CA3AF;
-  --sidebar: #0E0E16;
-  --sidebar-border: #1A1A28;
-  --radius: 16px;
-  --transition: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --bg:          #0B0B0F;
+  --surface-1:   #0C0C18;
+  --surface-2:   #0F0F1E;
+  --surface-3:   #13132A;
+  --border-1:    #17172A;
+  --border-2:    #22223A;
+  --border-3:    #2E2E4A;
+  --text-1:      #F0F0FF;
+  --text-2:      #9A9ABE;
+  --text-3:      #5A5A7A;
+  --text-4:      #3A3A58;
+  --neon:        #D4FF3F;
+  --purple:      #7B4DFF;
+  --success:     #22C55E;
+  --warning:     #F59E0B;
+  --danger:      #EF4444;
+  --radius-sm:   10px;
+  --radius:      16px;
+  --radius-lg:   20px;
+  --transition:  150ms cubic-bezier(0.4, 0, 0.2, 1);
+  /* Legacy aliases kept for compatibility */
+  --background:  #0B0B0F;
+  --foreground:  #ffffff;
+  --card:        #0F0F1E;
+  --card-hover:  #13132A;
+  --border:      #22223A;
+  --muted:       #5A5A7A;
+  --sidebar:     #0C0C18;
+  --sidebar-border: #17172A;
 }
 
 @theme inline {
