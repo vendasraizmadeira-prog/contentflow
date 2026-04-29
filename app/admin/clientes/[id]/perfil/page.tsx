@@ -1,17 +1,17 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 type Highlight = { id: string; title: string; cover: string };
 
 export default function PerfilEditor() {
   const { id } = useParams() as { id: string };
-  const router = useRouter();
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState("");
 
   const [displayName, setDisplayName] = useState("");
   const [username, setUsername] = useState("");
@@ -84,6 +84,7 @@ export default function PerfilEditor() {
 
   const save = async () => {
     setSaving(true);
+    setSaveError("");
     const supabase = createClient();
     const { error } = await supabase
       .from("profiles")
@@ -104,6 +105,8 @@ export default function PerfilEditor() {
     if (!error) {
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
+    } else {
+      setSaveError(error.message);
     }
   };
 
@@ -119,11 +122,6 @@ export default function PerfilEditor() {
 
   return (
     <div className="p-4 md:p-6">
-      <button onClick={() => router.back()} className="flex items-center gap-2 mb-5 w-fit">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
-        <span className="text-sm" style={{ color: "#6B7280" }}>Voltar</span>
-      </button>
-
       <h1 className="text-xl font-bold mb-5">Perfil Instagram</h1>
 
       <div className="flex flex-col lg:flex-row gap-5">
@@ -223,21 +221,16 @@ export default function PerfilEditor() {
                   {highlights.map((h) => (
                     <div key={h.id} className="flex flex-col items-center gap-1">
                       <div className="relative">
-                        <div
-                          className="w-14 h-14 rounded-full overflow-hidden cursor-pointer"
-                          style={{ border: "2px solid #2A2A38" }}
-                          onClick={() => hlRefs.current[h.id]?.click()}
-                        >
-                          <img src={h.cover} alt="" className="w-full h-full object-cover" />
-                        </div>
-                        <button
-                          onClick={() => hlRefs.current[h.id]?.click()}
-                          className="absolute bottom-0 right-0 w-5 h-5 rounded-full flex items-center justify-center"
-                          style={{ background: "#7B4DFF" }}
-                        >
-                          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3"/></svg>
-                        </button>
+                        <label htmlFor={`hl-cover-${h.id}`} className="block cursor-pointer">
+                          <div className="w-14 h-14 rounded-full overflow-hidden" style={{ border: "2px solid #2A2A38" }}>
+                            <img src={h.cover} alt="" className="w-full h-full object-cover" />
+                          </div>
+                          <div className="absolute bottom-0 right-0 w-5 h-5 rounded-full flex items-center justify-center" style={{ background: "#7B4DFF" }}>
+                            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3"/></svg>
+                          </div>
+                        </label>
                         <input
+                          id={`hl-cover-${h.id}`}
                           type="file"
                           accept="image/*"
                           className="hidden"
@@ -263,10 +256,9 @@ export default function PerfilEditor() {
               <div className="flex gap-2 items-end">
                 {/* Cover picker for new highlight */}
                 <div className="flex-shrink-0">
-                  <button
-                    type="button"
-                    onClick={() => newHLCoverRef.current?.click()}
-                    className="w-12 h-12 rounded-full flex items-center justify-center overflow-hidden"
+                  <label
+                    htmlFor="new-hl-cover"
+                    className="w-12 h-12 rounded-full flex items-center justify-center overflow-hidden cursor-pointer"
                     style={{ background: newHLCover ? "transparent" : "#0B0B0F", border: `2px dashed ${newHLCover ? "#7B4DFF" : "#2A2A38"}` }}
                   >
                     {newHLCover ? (
@@ -274,8 +266,8 @@ export default function PerfilEditor() {
                     ) : (
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2" strokeLinecap="round"><path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3"/></svg>
                     )}
-                  </button>
-                  <input ref={newHLCoverRef} type="file" accept="image/*" onChange={handleNewHLCover} className="hidden" />
+                  </label>
+                  <input id="new-hl-cover" ref={newHLCoverRef} type="file" accept="image/*" onChange={handleNewHLCover} className="hidden" />
                 </div>
                 <input
                   value={newHL}
@@ -292,6 +284,9 @@ export default function PerfilEditor() {
               <p className="text-xs mt-1.5" style={{ color: "#4B5563" }}>Clique no círculo para escolher a imagem do destaque</p>
             </div>
 
+            {saveError && (
+              <p className="mb-3 text-xs px-3 py-2 rounded-xl" style={{ background: "#FF6B6B22", color: "#FF6B6B" }}>{saveError}</p>
+            )}
             <button
               onClick={save}
               disabled={saving}

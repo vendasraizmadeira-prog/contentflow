@@ -4,12 +4,12 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 const questions = [
-  { id: "niche", label: "Qual é o seu nicho/segmento?", placeholder: "Ex: Beleza, alimentação saudável, moda..." },
-  { id: "audience", label: "Quem é seu público-alvo?", placeholder: "Ex: Mulheres de 25-35 anos interessadas em beleza natural..." },
-  { id: "tone", label: "Qual é o tom de voz da marca?", placeholder: "Ex: Descontraído, profissional, inspirador..." },
-  { id: "goals", label: "Quais são seus objetivos?", placeholder: "Ex: Aumentar vendas, ganhar seguidores, fortalecer marca..." },
-  { id: "competitors", label: "Quem são seus principais concorrentes?", placeholder: "Ex: @marcaX, @marcaY..." },
-  { id: "differentials", label: "Quais são seus diferenciais?", placeholder: "Ex: Produto artesanal, atendimento personalizado..." },
+  { id: "niche",       label: "Qual é o seu nicho/segmento?",         placeholder: "Ex: Beleza, alimentação saudável, moda..." },
+  { id: "audience",   label: "Quem é seu público-alvo?",              placeholder: "Ex: Mulheres de 25-35 anos interessadas em beleza natural..." },
+  { id: "tone",       label: "Qual é o tom de voz da marca?",         placeholder: "Ex: Descontraído, profissional, inspirador..." },
+  { id: "goals",      label: "Quais são seus objetivos?",             placeholder: "Ex: Aumentar vendas, ganhar seguidores, fortalecer marca..." },
+  { id: "competitors",label: "Quem são seus principais concorrentes?",placeholder: "Ex: @marcaX, @marcaY..." },
+  { id: "differentials",label: "Quais são seus diferenciais?",        placeholder: "Ex: Produto artesanal, atendimento personalizado..." },
 ];
 
 export default function Briefing() {
@@ -18,6 +18,7 @@ export default function Briefing() {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState("");
   const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -51,24 +52,42 @@ export default function Briefing() {
   }, []);
 
   const save = async () => {
-    if (!userId) return;
-    setSaving(true);
+    setError("");
     const supabase = createClient();
+
+    let uid = userId;
+    if (!uid) {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { setError("Sessão expirada. Faça login novamente."); return; }
+      uid = user.id;
+      setUserId(uid);
+    }
+
+    setSaving(true);
 
     const upserts = questions
       .filter((q) => answers[q.id]?.trim())
-      .map((q) => ({ user_id: userId, question_id: q.id, answer: answers[q.id] }));
+      .map((q) => ({ user_id: uid!, question_id: q.id, answer: answers[q.id] }));
 
     if (upserts.length > 0) {
-      await supabase.from("briefing_answers").upsert(upserts, { onConflict: "user_id,question_id" });
+      const { error: ansErr } = await supabase
+        .from("briefing_answers")
+        .upsert(upserts, { onConflict: "user_id,question_id" });
+      if (ansErr) { setError(ansErr.message); setSaving(false); return; }
     }
 
+    const { error: profErr } = await supabase
+      .from("profiles")
+      .update({ briefing_completed: true })
+      .eq("id", uid);
+
+    if (profErr) { setError(profErr.message); setSaving(false); return; }
+
+    setSaving(false);
+
     if (isFirstAccess) {
-      await supabase.from("profiles").update({ briefing_completed: true }).eq("id", userId);
-      setSaving(false);
       router.push("/metricas");
     } else {
-      setSaving(false);
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     }
@@ -126,13 +145,19 @@ export default function Briefing() {
           ))}
         </div>
 
+        {error && (
+          <p className="mt-4 text-xs px-3 py-2 rounded-xl" style={{ background: "#FF6B6B22", color: "#FF6B6B" }}>
+            {error}
+          </p>
+        )}
+
         <button
           onClick={save}
           disabled={saving}
           className="w-full py-3.5 rounded-xl font-bold text-sm mt-6 transition-all hover:opacity-90 disabled:opacity-60"
           style={{ background: "#D4FF3F", color: "#0B0B0F" }}
         >
-          {saving ? "Salvando..." : isFirstAccess ? "Concluir e acessar o app →" : "Salvar briefing"}
+          {saving ? "Salvando..." : isFirstAccess ? "Concluir e acessar o app →" : saved ? "✓ Salvo" : "Salvar briefing"}
         </button>
       </div>
     </div>
