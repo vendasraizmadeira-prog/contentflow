@@ -57,11 +57,10 @@ export default function ClienteRoteiros() {
 
   return (
     <div className="p-4 md:p-6 max-w-2xl">
-      <Link href={`/admin/clientes/${id}`}>
-        <div className="flex items-center gap-2 mb-4 w-fit">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
-          <span className="text-sm" style={{ color: "#6B7280" }}>{clientName || "Voltar"}</span>
-        </div>
+      {/* Desktop-only back button — mobile has AdminTopBar breadcrumb */}
+      <Link href={`/admin/clientes/${id}`} className="hidden md:flex items-center gap-2 mb-4 w-fit">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+        <span className="text-sm" style={{ color: "#6B7280" }}>{clientName || "Voltar"}</span>
       </Link>
 
       <div className="flex items-center justify-between mb-5">
@@ -69,7 +68,8 @@ export default function ClienteRoteiros() {
           <h1 className="text-xl font-bold">Roteiros</h1>
           <p className="text-sm mt-0.5" style={{ color: "#6B7280" }}>{roteiros.length} roteiro{roteiros.length !== 1 ? "s" : ""} no total</p>
         </div>
-        <Link href={`/admin/clientes/${id}/roteiros/novo`}>
+        {/* Desktop-only new button — mobile has AdminTopBar + button */}
+        <Link href={`/admin/clientes/${id}/roteiros/novo`} className="hidden md:block">
           <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold" style={{ background: "#7B4DFF", color: "#fff" }}>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
             Novo

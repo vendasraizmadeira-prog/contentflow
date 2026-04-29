@@ -5,6 +5,13 @@ import { createClient } from "@/lib/supabase/client";
 
 type Highlight = { id: string; title: string; cover: string };
 
+async function uploadToStorage(file: File, path: string): Promise<string> {
+  const supabase = createClient();
+  const { error } = await supabase.storage.from("media").upload(path, file, { upsert: true, contentType: file.type });
+  if (error) throw new Error(error.message);
+  return supabase.storage.from("media").getPublicUrl(path).data.publicUrl;
+}
+
 export default function PerfilEditor() {
   const { id } = useParams() as { id: string };
 
@@ -23,13 +30,16 @@ export default function PerfilEditor() {
   const [posts, setPosts] = useState(0);
   const [highlights, setHighlights] = useState<Highlight[]>([]);
 
-  // For adding a new highlight
   const [newHL, setNewHL] = useState("");
   const [newHLCover, setNewHLCover] = useState<string | null>(null);
-  const newHLCoverRef = useRef<HTMLInputElement>(null);
-  const avatarRef = useRef<HTMLInputElement>(null);
 
-  // Per-highlight cover update refs
+  // Track actual File objects for upload
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [hlCoverFiles, setHlCoverFiles] = useState<Record<string, File>>({});
+  const [newHLCoverFile, setNewHLCoverFile] = useState<File | null>(null);
+
+  const avatarRef = useRef<HTMLInputElement>(null);
+  const newHLCoverRef = useRef<HTMLInputElement>(null);
   const hlRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
   useEffect(() => {
@@ -59,33 +69,79 @@ export default function PerfilEditor() {
 
   const handleAvatar = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
-    if (f) setAvatar(URL.createObjectURL(f));
+    if (f) {
+      setAvatar(URL.createObjectURL(f));
+      setAvatarFile(f);
+    }
   };
 
   const handleNewHLCover = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
-    if (f) setNewHLCover(URL.createObjectURL(f));
+    if (f) {
+      setNewHLCover(URL.createObjectURL(f));
+      setNewHLCoverFile(f);
+    }
   };
 
   const handleHLCoverUpdate = (hlId: string, e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
     if (!f) return;
-    const url = URL.createObjectURL(f);
-    setHighlights((prev) => prev.map((h) => h.id === hlId ? { ...h, cover: url } : h));
+    setHighlights((prev) => prev.map((h) => h.id === hlId ? { ...h, cover: URL.createObjectURL(f) } : h));
+    setHlCoverFiles((prev) => ({ ...prev, [hlId]: f }));
   };
 
   const addHL = () => {
     if (!newHL.trim()) return;
+    const newId = `h${Date.now()}`;
     const cover = newHLCover ?? "https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=120&h=120&fit=crop";
-    setHighlights([...highlights, { id: `h${Date.now()}`, title: newHL.trim(), cover }]);
+    setHighlights([...highlights, { id: newId, title: newHL.trim(), cover }]);
+    if (newHLCoverFile) {
+      setHlCoverFiles((prev) => ({ ...prev, [newId]: newHLCoverFile }));
+    }
     setNewHL("");
     setNewHLCover(null);
+    setNewHLCoverFile(null);
   };
 
   const save = async () => {
     setSaving(true);
     setSaveError("");
     const supabase = createClient();
+
+    // Upload avatar if a new file was selected
+    let finalAvatar = avatar;
+    if (avatarFile) {
+      try {
+        const ext = avatarFile.type.split("/")[1] || "jpg";
+        finalAvatar = await uploadToStorage(avatarFile, `avatars/${id}_avatar.${ext}`);
+        setAvatar(finalAvatar);
+        setAvatarFile(null);
+      } catch {
+        setSaveError("Erro ao fazer upload da foto de perfil. Verifique se o bucket 'media' existe no Supabase Storage.");
+        setSaving(false);
+        return;
+      }
+    }
+
+    // Upload highlight covers for any that have new files
+    let finalHighlights = [...highlights];
+    for (const hl of finalHighlights) {
+      const file = hlCoverFiles[hl.id];
+      if (file) {
+        try {
+          const ext = file.type.split("/")[1] || "jpg";
+          const url = await uploadToStorage(file, `highlights/${id}_${hl.id}.${ext}`);
+          finalHighlights = finalHighlights.map((h) => h.id === hl.id ? { ...h, cover: url } : h);
+        } catch {
+          setSaveError("Erro ao fazer upload de imagem de destaque.");
+          setSaving(false);
+          return;
+        }
+      }
+    }
+    setHighlights(finalHighlights);
+    setHlCoverFiles({});
+
     const { error } = await supabase
       .from("profiles")
       .update({
@@ -93,11 +149,11 @@ export default function PerfilEditor() {
         instagram: username ? `@${username.replace("@", "")}` : "",
         bio,
         website,
-        avatar,
+        avatar: finalAvatar,
         followers,
         following,
         posts,
-        highlights,
+        highlights: finalHighlights,
       })
       .eq("id", id);
 
@@ -140,19 +196,15 @@ export default function PerfilEditor() {
                     {displayName.charAt(0) || "?"}
                   </div>
                 )}
-                <button
-                  onClick={() => avatarRef.current?.click()}
-                  className="absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center"
-                  style={{ background: "#7B4DFF" }}
-                >
+                <label htmlFor="avatar-input" className="absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center cursor-pointer" style={{ background: "#7B4DFF" }}>
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3"/></svg>
-                </button>
-                <input ref={avatarRef} type="file" accept="image/*" onChange={handleAvatar} className="hidden" />
+                </label>
+                <input id="avatar-input" ref={avatarRef} type="file" accept="image/*" onChange={handleAvatar} className="hidden" />
               </div>
               <div>
                 <p className="text-sm font-medium">{displayName || "—"}</p>
                 <p className="text-xs mt-0.5" style={{ color: "#6B7280" }}>@{username || "handle"}</p>
-                <button onClick={() => avatarRef.current?.click()} className="text-xs mt-2" style={{ color: "#7B4DFF" }}>Alterar foto</button>
+                <label htmlFor="avatar-input" className="text-xs mt-2 block cursor-pointer" style={{ color: "#7B4DFF" }}>Alterar foto</label>
               </div>
             </div>
 
@@ -215,7 +267,6 @@ export default function PerfilEditor() {
             <div className="mb-5">
               <label className="text-xs font-semibold block mb-3" style={{ color: "#9CA3AF" }}>DESTAQUES</label>
 
-              {/* Existing highlights with cover update */}
               {highlights.length > 0 && (
                 <div className="flex gap-3 flex-wrap mb-3">
                   {highlights.map((h) => (
@@ -223,7 +274,7 @@ export default function PerfilEditor() {
                       <div className="relative">
                         <label htmlFor={`hl-cover-${h.id}`} className="block cursor-pointer">
                           <div className="w-14 h-14 rounded-full overflow-hidden" style={{ border: "2px solid #2A2A38" }}>
-                            <img src={h.cover} alt="" className="w-full h-full object-cover" />
+                            <img src={h.cover} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
                           </div>
                           <div className="absolute bottom-0 right-0 w-5 h-5 rounded-full flex items-center justify-center" style={{ background: "#7B4DFF" }}>
                             <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3"/></svg>
@@ -240,10 +291,7 @@ export default function PerfilEditor() {
                       </div>
                       <div className="flex items-center gap-1">
                         <span className="text-xs" style={{ maxWidth: 56, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{h.title}</span>
-                        <button
-                          onClick={() => setHighlights(highlights.filter((x) => x.id !== h.id))}
-                          style={{ color: "#6B7280" }}
-                        >
+                        <button onClick={() => setHighlights(highlights.filter((x) => x.id !== h.id))} style={{ color: "#6B7280" }}>
                           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
                         </button>
                       </div>
@@ -252,9 +300,7 @@ export default function PerfilEditor() {
                 </div>
               )}
 
-              {/* Add new highlight */}
               <div className="flex gap-2 items-end">
-                {/* Cover picker for new highlight */}
                 <div className="flex-shrink-0">
                   <label
                     htmlFor="new-hl-cover"
@@ -340,29 +386,14 @@ export default function PerfilEditor() {
                 <div className="flex gap-3 mt-3 overflow-x-auto pb-1">
                   {highlights.slice(0, 5).map((h) => (
                     <div key={h.id} className="flex flex-col items-center gap-1 flex-shrink-0">
-                      <div className="w-14 h-14 rounded-full overflow-hidden" style={{ border: "2px solid #333" }}>
-                        <img src={h.cover} alt="" className="w-full h-full object-cover" />
+                      <div className="w-14 h-14 rounded-full overflow-hidden" style={{ border: "2px solid #333", background: "#1A1A22" }}>
+                        <img src={h.cover} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
                       </div>
                       <p className="text-xs text-white text-center truncate w-14">{h.title}</p>
                     </div>
                   ))}
                 </div>
               )}
-            </div>
-
-            <div className="grid grid-cols-3 gap-px" style={{ background: "#111" }}>
-              {[
-                "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=200&h=200&fit=crop",
-                "https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=200&h=200&fit=crop",
-                "https://images.unsplash.com/photo-1542601906897-eef9bd27d1d9?w=200&h=200&fit=crop",
-                "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=200&h=200&fit=crop",
-                "https://images.unsplash.com/photo-1559181567-c3190f7fb52a?w=200&h=200&fit=crop",
-                "https://images.unsplash.com/photo-1556228852-80b6e5eeff06?w=200&h=200&fit=crop",
-              ].map((src, i) => (
-                <div key={i} className="aspect-square overflow-hidden">
-                  <img src={src} alt="" className="w-full h-full object-cover" />
-                </div>
-              ))}
             </div>
           </div>
         </div>

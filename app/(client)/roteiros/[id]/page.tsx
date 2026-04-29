@@ -1,108 +1,144 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { mockRoteiros, type RoteiroHistoryEntry } from "@/lib/mock-data";
+import { createClient } from "@/lib/supabase/client";
+
+type HistoryEntry = { id: string; timestamp: string; action: "criado" | "editado" | "aprovado"; note: string; author: string; };
+type Roteiro = { id: string; title: string; type: string; status: string; content: string; created_at: string; history: HistoryEntry[]; };
 
 const typeLabel: Record<string, string> = { post: "Post", reel: "Reels", carousel: "Carrossel", story: "Stories" };
 const typeColor: Record<string, string> = { post: "#D4FF3F", reel: "#7B4DFF", carousel: "#D4FF3F", story: "#FF6B6B" };
 
-function now() {
-  return new Date().toLocaleString("pt-BR", {
-    day: "2-digit", month: "2-digit", year: "numeric",
-    hour: "2-digit", minute: "2-digit",
-  }).replace(",", "");
+function nowStr() {
+  return new Date().toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }).replace(",", "");
 }
 
+const actionIcon = (action: string) => {
+  if (action === "criado") return { color: "#6B7280", icon: "M12 4v16m8-8H4" };
+  if (action === "editado") return { color: "#D4FF3F", icon: "M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" };
+  return { color: "#10B981", icon: "M5 13l4 4L19 7" };
+};
+
 export default function RoteiroDetail() {
-  const params = useParams();
+  const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const source = mockRoteiros.find((r) => r.id === params.id);
 
-  const [content, setContent] = useState(source?.content ?? "");
-  const [status, setStatus] = useState(source?.status ?? "pendente");
-  const [history, setHistory] = useState<RoteiroHistoryEntry[]>(source?.history ?? []);
+  const [roteiro, setRoteiro] = useState<Roteiro | null>(null);
+  const [content, setContent] = useState("");
+  const [history, setHistory] = useState<HistoryEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [approved, setApproved] = useState(false);
+  const [userName, setUserName] = useState("");
+  const [userId, setUserId] = useState("");
 
-  if (!source) {
+  useEffect(() => {
+    const load = async () => {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      setUserId(user.id);
+
+      const [{ data: r }, { data: prof }] = await Promise.all([
+        supabase.from("roteiros").select("*").eq("id", id).eq("client_id", user.id).single(),
+        supabase.from("profiles").select("name").eq("id", user.id).single(),
+      ]);
+
+      if (r) {
+        setRoteiro(r);
+        setContent(r.content ?? "");
+        setHistory(r.history ?? []);
+      }
+      setUserName(prof?.name ?? "Cliente");
+      setLoading(false);
+    };
+    load();
+  }, [id]);
+
+  const handleSave = async () => {
+    if (!roteiro || !content.trim() || saving) return;
+    setSaving(true);
+    const supabase = createClient();
+    const entry: HistoryEntry = {
+      id: `h${Date.now()}`,
+      timestamp: nowStr(),
+      action: "editado",
+      note: "Conteúdo editado pelo cliente.",
+      author: userName,
+    };
+    const newHistory = [...history, entry];
+    const { error } = await supabase.from("roteiros").update({ content, history: newHistory }).eq("id", roteiro.id);
+    if (!error) {
+      setHistory(newHistory);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    }
+    setSaving(false);
+  };
+
+  const handleApprove = async () => {
+    if (!roteiro || roteiro.status === "aprovado" || saving) return;
+    setSaving(true);
+    const supabase = createClient();
+    const entry: HistoryEntry = {
+      id: `h${Date.now()}`,
+      timestamp: nowStr(),
+      action: "aprovado",
+      note: "Roteiro aprovado pelo cliente.",
+      author: userName,
+    };
+    const newHistory = [...history, entry];
+    const { error } = await supabase.from("roteiros").update({ status: "aprovado", history: newHistory }).eq("id", roteiro.id);
+    if (!error) {
+      setRoteiro({ ...roteiro, status: "aprovado" });
+      setHistory(newHistory);
+      // Notify admin
+      await fetch("/api/notify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ targetRole: "admin", title: `Roteiro aprovado por ${userName}`, message: roteiro.title, type: "approved", url: `/admin/clientes/${userId}/roteiros/${roteiro.id}` }),
+      });
+    }
+    setSaving(false);
+  };
+
+  if (loading) {
     return (
-      <div className="p-6 text-center" style={{ color: "#6B7280" }}>
-        <p>Roteiro não encontrado.</p>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "#0B0B0F" }}>
+        <div className="w-8 h-8 rounded-full border-2 animate-spin" style={{ borderColor: "#D4FF3F", borderTopColor: "transparent" }} />
       </div>
     );
   }
 
-  const isDirty = content !== (history[history.length - 1]?.note === "Edição salva" ? content : source.content);
+  if (!roteiro) {
+    return (
+      <div className="p-6 text-center" style={{ color: "#6B7280" }}>
+        <p className="text-lg font-semibold mb-2">Roteiro não encontrado</p>
+        <button onClick={() => router.back()} className="text-sm" style={{ color: "#D4FF3F" }}>Voltar</button>
+      </div>
+    );
+  }
 
-  const handleSave = () => {
-    if (!content.trim()) return;
-    const entry: RoteiroHistoryEntry = {
-      id: `h${Date.now()}`,
-      timestamp: now(),
-      action: "editado",
-      note: "Edição salva pelo cliente.",
-      author: "João Silva",
-    };
-    setHistory((prev) => [...prev, entry]);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
-  };
-
-  const handleApprove = () => {
-    if (status === "revisado") return;
-    const entry: RoteiroHistoryEntry = {
-      id: `h${Date.now()}`,
-      timestamp: now(),
-      action: "aprovado",
-      note: "Roteiro aprovado pelo cliente.",
-      author: "João Silva",
-    };
-    setHistory((prev) => [...prev, entry]);
-    setStatus("revisado");
-    setApproved(true);
-  };
-
-  const actionIcon = (action: string) => {
-    if (action === "criado") return { color: "#6B7280", icon: "M12 4v16m8-8H4" };
-    if (action === "editado") return { color: "#D4FF3F", icon: "M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" };
-    return { color: "#10B981", icon: "M5 13l4 4L19 7" };
-  };
-
-  const color = typeColor[source.type];
+  const color = typeColor[roteiro.type] ?? "#7B4DFF";
+  const isApproved = roteiro.status === "aprovado";
 
   return (
     <div className="p-4 md:p-6 max-w-2xl">
-      {/* Header */}
       <div className="flex items-center gap-3 mb-5">
-        <button
-          onClick={() => router.back()}
-          className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-          style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round">
-            <path d="M15 18l-6-6 6-6" />
-          </svg>
+        <button onClick={() => router.back()} className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
         </button>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-0.5">
-            <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: `${color}22`, color }}>
-              {typeLabel[source.type]}
-            </span>
-            <span
-              className="text-xs font-semibold px-2 py-0.5 rounded-full"
-              style={{
-                background: status === "revisado" ? "#10B98122" : "#F59E0B22",
-                color: status === "revisado" ? "#10B981" : "#F59E0B",
-              }}
-            >
-              {status === "revisado" ? "Aprovado" : "Pendente"}
+            <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: `${color}22`, color }}>{typeLabel[roteiro.type] ?? roteiro.type}</span>
+            <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ background: isApproved ? "#10B98122" : "#F59E0B22", color: isApproved ? "#10B981" : "#F59E0B" }}>
+              {isApproved ? "Aprovado" : "Pendente"}
             </span>
           </div>
-          <h1 className="font-bold text-base truncate">{source.title}</h1>
+          <h1 className="font-bold text-base truncate">{roteiro.title}</h1>
         </div>
       </div>
 
-      {/* Editor */}
       <div className="rounded-2xl p-4 mb-4" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
         <p className="text-xs font-semibold mb-3" style={{ color: "#9CA3AF" }}>TEXTO DO ROTEIRO</p>
         <textarea
@@ -114,59 +150,37 @@ export default function RoteiroDetail() {
         />
       </div>
 
-      {/* Save */}
       <button
         onClick={handleSave}
-        className="w-full py-3.5 rounded-2xl font-semibold text-sm mb-3 transition-all active:scale-[0.97]"
-        style={{
-          background: saved ? "#10B981" : "#1A1A22",
-          color: saved ? "#fff" : "#D4FF3F",
-          border: `1px solid ${saved ? "#10B981" : "#D4FF3F"}`,
-        }}
+        disabled={saving}
+        className="w-full py-3.5 rounded-2xl font-semibold text-sm mb-3 transition-all active:scale-[0.97] disabled:opacity-60"
+        style={{ background: saved ? "#10B981" : "#1A1A22", color: saved ? "#fff" : "#D4FF3F", border: `1px solid ${saved ? "#10B981" : "#D4FF3F"}` }}
       >
-        {saved ? "✓ Alterações salvas" : "Salvar alterações"}
+        {saving ? "Salvando..." : saved ? "✓ Alterações salvas" : "Salvar alterações"}
       </button>
 
-      {/* Approve */}
-      {status === "pendente" ? (
-        <button
-          onClick={handleApprove}
-          className="w-full py-3.5 rounded-2xl font-bold text-sm transition-all active:scale-[0.97]"
-          style={{ background: "#D4FF3F", color: "#0B0B0F" }}
-        >
+      {!isApproved ? (
+        <button onClick={handleApprove} disabled={saving} className="w-full py-3.5 rounded-2xl font-bold text-sm transition-all active:scale-[0.97] disabled:opacity-60" style={{ background: "#D4FF3F", color: "#0B0B0F" }}>
           Aprovar roteiro
         </button>
       ) : (
-        <div
-          className="w-full py-3.5 rounded-2xl font-bold text-sm text-center"
-          style={{ background: "#10B98122", color: "#10B981", border: "1px solid #10B981" }}
-        >
+        <div className="w-full py-3.5 rounded-2xl font-bold text-sm text-center" style={{ background: "#10B98122", color: "#10B981", border: "1px solid #10B981" }}>
           ✓ Roteiro aprovado
         </div>
       )}
 
-      {/* History */}
       <div className="mt-8">
         <p className="text-xs font-semibold mb-4" style={{ color: "#9CA3AF" }}>HISTÓRICO DE ALTERAÇÕES</p>
         <div className="relative">
-          {/* Vertical line */}
           <div className="absolute left-3.5 top-0 bottom-0 w-px" style={{ background: "#2A2A38" }} />
-
           <div className="flex flex-col gap-0">
-            {history.map((entry, i) => {
+            {history.map((entry) => {
               const { color: dotColor, icon } = actionIcon(entry.action);
               return (
                 <div key={entry.id} className="flex gap-4 pb-5 relative">
-                  {/* Dot */}
-                  <div
-                    className="relative z-10 w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
-                    style={{ background: `${dotColor}22`, border: `1.5px solid ${dotColor}` }}
-                  >
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={dotColor} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d={icon} />
-                    </svg>
+                  <div className="relative z-10 w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: `${dotColor}22`, border: `1.5px solid ${dotColor}` }}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={dotColor} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d={icon}/></svg>
                   </div>
-                  {/* Content */}
                   <div className="flex-1 pt-0.5">
                     <div className="flex items-center gap-2 flex-wrap mb-1">
                       <span className="text-sm font-semibold" style={{ color: dotColor }}>
