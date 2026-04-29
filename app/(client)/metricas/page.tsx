@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { mockMetrics, mockContents } from "@/lib/mock-data";
 
 type Profile = {
   id: string;
@@ -16,26 +15,27 @@ type Profile = {
   warmth_score: number;
 };
 
-const statusConfig: Record<string, { label: string; bg: string; color: string }> = {
-  review:    { label: "Em revisão", bg: "rgba(251,191,36,0.85)",  color: "#000" },
-  approved:  { label: "Aprovado",   bg: "rgba(34,197,94,0.85)",   color: "#000" },
-  scheduled: { label: "Agendado",   bg: "rgba(129,140,248,0.85)", color: "#000" },
-  posted:    { label: "Postado",    bg: "rgba(107,114,128,0.85)", color: "#fff" },
+type ContentItem = {
+  id: string;
+  type: string;
+  status: string;
+  images: string[];
+  caption: string | null;
 };
 
-const chartW = 500, chartH = 160;
-const minF = 22000, maxF = 26000;
-const points = mockMetrics.map((m, i) => ({
-  x: 30 + (i / (mockMetrics.length - 1)) * (chartW - 60),
-  y: chartH - 30 - ((m.followers - minF) / (maxF - minF)) * (chartH - 60),
-  ...m,
-}));
-const polyline = points.map((p) => `${p.x},${p.y}`).join(" ");
-const area = `${points[0].x},${chartH - 30} ${polyline} ${points[points.length - 1].x},${chartH - 30}`;
+const statusConfig: Record<string, { label: string; bg: string; color: string }> = {
+  aguardando: { label: "Aguardando", bg: "rgba(107,114,128,0.85)", color: "#fff" },
+  em_revisao: { label: "Em revisão", bg: "rgba(251,191,36,0.85)",  color: "#000" },
+  aprovado:   { label: "Aprovado",   bg: "rgba(34,197,94,0.85)",   color: "#000" },
+  agendado:   { label: "Agendado",   bg: "rgba(129,140,248,0.85)", color: "#000" },
+};
 
 export default function Metricas() {
   const [activeTab, setActiveTab] = useState<"grid" | "stats">("grid");
+  const [contentTab, setContentTab] = useState<"posts" | "reels">("posts");
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [contents, setContents] = useState<ContentItem[]>([]);
+  const [loadingContents, setLoadingContents] = useState(true);
 
   useEffect(() => {
     const load = async () => {
@@ -43,13 +43,29 @@ export default function Metricas() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { data } = await supabase
+      const { data: profileData } = await supabase
         .from("profiles")
         .select("id, name, instagram, avatar, followers, following, posts, growth, warmth_score")
         .eq("id", user.id)
         .single();
+      if (profileData) setProfile(profileData);
 
-      if (data) setProfile(data);
+      const { data: items } = await supabase
+        .from("producao_items")
+        .select("id, type, status, images, caption")
+        .eq("client_id", user.id)
+        .order("created_at", { ascending: false });
+
+      setContents(
+        (items ?? []).map((it: { id: string; type: string; status: string; images: string[] | null; caption: string | null }) => ({
+          id: it.id,
+          type: it.type,
+          status: it.status,
+          images: it.images ?? [],
+          caption: it.caption,
+        }))
+      );
+      setLoadingContents(false);
     };
     load();
   }, []);
@@ -63,6 +79,95 @@ export default function Metricas() {
   const followerGrowth = profile?.growth ?? 0;
   const warmthScore = profile?.warmth_score ?? 0;
 
+  const filteredContents = contents.filter((c) =>
+    contentTab === "reels" ? c.type === "reel" : c.type !== "reel"
+  );
+
+  const GridContent = ({ cols }: { cols: number }) => {
+    if (loadingContents) {
+      return (
+        <div className="grid gap-0.5" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="aspect-square animate-pulse" style={{ background: "#1A1A22" }} />
+          ))}
+        </div>
+      );
+    }
+
+    if (filteredContents.length === 0) {
+      return (
+        <div className="flex flex-col items-center justify-center py-16 gap-3">
+          <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{ background: "#1A1A22" }}>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#4B5563" strokeWidth="1.5" strokeLinecap="round">
+              <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>
+            </svg>
+          </div>
+          <p className="font-semibold" style={{ color: "#6B7280" }}>Nenhum conteúdo ainda</p>
+          <p className="text-xs text-center" style={{ color: "#4B5563" }}>Sua agência está criando seu conteúdo</p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="grid gap-0.5" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
+        {filteredContents.map((c) => {
+          const thumbnail = c.images?.[0] ?? "";
+          const st = statusConfig[c.status] ?? statusConfig.aguardando;
+          const href = c.type === "reel" ? `/reels/${c.id}` : `/post/${c.id}`;
+          return (
+            <Link key={c.id} href={href}>
+              <div className="relative aspect-square overflow-hidden" style={{ background: "#1A1A22" }}>
+                {thumbnail ? (
+                  <img src={thumbnail} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center" style={{ background: "#1A1A22" }}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4B5563" strokeWidth="1.5" strokeLinecap="round">
+                      <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>
+                    </svg>
+                  </div>
+                )}
+                <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.7) 100%)" }} />
+                {c.type === "reel" && (
+                  <div className="absolute top-2 right-2">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                  </div>
+                )}
+                {c.type === "carousel" && (
+                  <div className="absolute top-2 right-2">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3h2a2 2 0 012 2v2M8 3H6a2 2 0 00-2 2v2"/></svg>
+                  </div>
+                )}
+                <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between px-1.5 pb-1.5">
+                  <span className="text-xs font-bold px-1.5 py-0.5 rounded-md" style={{ background: st.bg, color: st.color, fontSize: 9 }}>
+                    {st.label}
+                  </span>
+                </div>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+    );
+  };
+
+  const ContentTabs = () => (
+    <div className="flex" style={{ borderBottom: "1px solid #1E1E2A" }}>
+      {(["posts", "reels"] as const).map((t) => (
+        <button
+          key={t}
+          onClick={() => setContentTab(t)}
+          className="flex-1 py-2.5 text-xs font-semibold uppercase tracking-wide"
+          style={{
+            color: contentTab === t ? "#fff" : "#6B7280",
+            borderBottom: contentTab === t ? "2px solid #D4FF3F" : "2px solid transparent",
+          }}
+        >
+          {t}
+        </button>
+      ))}
+    </div>
+  );
+
   return (
     <div className="min-h-screen" style={{ background: "#0B0B0F" }}>
 
@@ -73,10 +178,7 @@ export default function Metricas() {
           <div className="flex items-center gap-3">
             <span className="text-xs font-medium whitespace-nowrap" style={{ color: "#6B7280" }}>Perfil Aquecido</span>
             <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: "#2A2A38" }}>
-              <div
-                className="h-2 rounded-full"
-                style={{ width: `${warmthScore}%`, background: "linear-gradient(90deg, #4B5563 10%, #D4FF3F 100%)" }}
-              />
+              <div className="h-2 rounded-full" style={{ width: `${warmthScore}%`, background: "linear-gradient(90deg, #4B5563 10%, #D4FF3F 100%)" }} />
             </div>
             <span className="text-xs font-bold" style={{ color: "#D4FF3F" }}>🔥 {warmthScore}%</span>
           </div>
@@ -95,7 +197,6 @@ export default function Metricas() {
                 )}
               </div>
             </div>
-
             <div className="flex-1 grid grid-cols-3 text-center gap-1">
               {[
                 [posts, "Posts"],
@@ -109,7 +210,6 @@ export default function Metricas() {
               ))}
             </div>
           </div>
-
           <p className="font-semibold text-sm">{name}</p>
           <p className="text-xs" style={{ color: "#9CA3AF" }}>{instagram}</p>
           <div className="flex items-center gap-1.5 mt-1">
@@ -123,6 +223,7 @@ export default function Metricas() {
           </div>
         </div>
 
+        {/* Main tabs */}
         <div className="flex" style={{ borderBottom: "1px solid #1E1E2A" }}>
           <button
             onClick={() => setActiveTab("grid")}
@@ -141,37 +242,10 @@ export default function Metricas() {
         </div>
 
         {activeTab === "grid" && (
-          <div className="grid grid-cols-3 gap-0.5">
-            {mockContents.map((c) => {
-              const st = statusConfig[c.status];
-              return (
-                <Link key={c.id} href={c.type === "reel" ? `/reels/${c.id}` : `/post/${c.id}`}>
-                  <div className="relative aspect-square overflow-hidden" style={{ background: "#1A1A22" }}>
-                    <img src={c.thumbnail} alt="" className="w-full h-full object-cover" />
-                    <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.7) 100%)" }} />
-                    {c.type === "reel" && (
-                      <div className="absolute top-2 right-2">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                      </div>
-                    )}
-                    {c.type === "carousel" && (
-                      <div className="absolute top-2 right-2">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3h2a2 2 0 012 2v2M8 3H6a2 2 0 00-2 2v2"/></svg>
-                      </div>
-                    )}
-                    <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between px-1.5 pb-1.5">
-                      <span className="text-xs font-bold px-1.5 py-0.5 rounded-md" style={{ background: st.bg, color: st.color, fontSize: 9, backdropFilter: "blur(4px)" }}>
-                        {st.label}
-                      </span>
-                      {c.comments > 0 && (
-                        <span className="text-xs font-bold" style={{ color: "#D4FF3F", fontSize: 9 }}>💬 {c.comments}</span>
-                      )}
-                    </div>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
+          <>
+            <ContentTabs />
+            <GridContent cols={3} />
+          </>
         )}
 
         {activeTab === "stats" && (
@@ -179,8 +253,8 @@ export default function Metricas() {
             <div className="grid grid-cols-3 gap-3">
               {[
                 { label: "Crescimento", value: `+${followerGrowth}%`, sub: "nos últimos 30 dias", color: "#22C55E" },
-                { label: "Alcance", value: "128K", sub: "+12.5% vs mês anterior", color: "#D4FF3F" },
-                { label: "Engajamento", value: "8.7K", sub: "+8.7% vs mês anterior", color: "#7B4DFF" },
+                { label: "Alcance", value: "—", sub: "dados em breve", color: "#D4FF3F" },
+                { label: "Engajamento", value: "—", sub: "dados em breve", color: "#7B4DFF" },
               ].map((s) => (
                 <div key={s.label} className="rounded-2xl p-3" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
                   <p className="text-xs mb-1" style={{ color: "#6B7280" }}>{s.label}</p>
@@ -189,31 +263,6 @@ export default function Metricas() {
                 </div>
               ))}
             </div>
-
-            <div className="rounded-2xl p-4" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
-              <p className="font-semibold text-sm mb-3">Crescimento de seguidores</p>
-              <svg viewBox={`0 0 ${chartW} ${chartH}`} className="w-full" style={{ height: 140 }}>
-                <defs>
-                  <linearGradient id="ag" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#D4FF3F" stopOpacity="0.25"/>
-                    <stop offset="100%" stopColor="#D4FF3F" stopOpacity="0"/>
-                  </linearGradient>
-                </defs>
-                {[0, 0.5, 1].map((pct, i) => {
-                  const y = chartH - 30 - pct * (chartH - 60);
-                  return <line key={i} x1={30} y1={y} x2={chartW - 20} y2={y} stroke="#2A2A38" strokeWidth="1"/>;
-                })}
-                <polygon points={area} fill="url(#ag)"/>
-                <polyline points={polyline} fill="none" stroke="#D4FF3F" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                {points.map((p, i) => (
-                  <g key={i}>
-                    <circle cx={p.x} cy={p.y} r="3.5" fill="#D4FF3F" stroke="#0B0B0F" strokeWidth="1.5"/>
-                    <text x={p.x} y={chartH - 10} textAnchor="middle" fontSize="9" fill="#6B7280">{p.date}</text>
-                  </g>
-                ))}
-              </svg>
-            </div>
-
             <div className="rounded-2xl p-4" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
               <div className="flex justify-between items-center mb-3">
                 <p className="font-semibold text-sm">Status do Perfil</p>
@@ -275,8 +324,8 @@ export default function Metricas() {
         <div className="grid grid-cols-3 gap-4 mb-4">
           {[
             { label: "Crescimento", value: `+${followerGrowth}%`, sub: "nos últimos 30 dias", color: "#22C55E" },
-            { label: "Alcance", value: "128K", sub: "+12.5% vs mês anterior", color: "#D4FF3F" },
-            { label: "Engajamento", value: "8.7K", sub: "+8.7% vs mês anterior", color: "#7B4DFF" },
+            { label: "Alcance", value: "—", sub: "dados em breve", color: "#D4FF3F" },
+            { label: "Engajamento", value: "—", sub: "dados em breve", color: "#7B4DFF" },
           ].map((s) => (
             <div key={s.label} className="rounded-2xl p-5" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
               <p className="text-xs mb-1" style={{ color: "#6B7280" }}>{s.label}</p>
@@ -286,56 +335,27 @@ export default function Metricas() {
           ))}
         </div>
 
-        <div className="rounded-2xl p-5 mb-4" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
-          <h3 className="font-semibold mb-4">Crescimento de seguidores</h3>
-          <svg viewBox={`0 0 ${chartW} ${chartH}`} className="w-full" style={{ height: 160 }}>
-            <defs>
-              <linearGradient id="ag2" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#D4FF3F" stopOpacity="0.2"/>
-                <stop offset="100%" stopColor="#D4FF3F" stopOpacity="0"/>
-              </linearGradient>
-            </defs>
-            {[0, 0.5, 1].map((pct, i) => {
-              const y = chartH - 30 - pct * (chartH - 60);
-              return <line key={i} x1={30} y1={y} x2={chartW - 20} y2={y} stroke="#2A2A38" strokeWidth="1"/>;
-            })}
-            <polygon points={area} fill="url(#ag2)"/>
-            <polyline points={polyline} fill="none" stroke="#D4FF3F" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-            {points.map((p, i) => (
-              <g key={i}>
-                <circle cx={p.x} cy={p.y} r="3.5" fill="#D4FF3F" stroke="#0B0B0F" strokeWidth="1.5"/>
-                <text x={p.x} y={chartH - 10} textAnchor="middle" fontSize="9" fill="#6B7280">{p.date}</text>
-              </g>
-            ))}
-          </svg>
-        </div>
-
         <div className="rounded-2xl overflow-hidden mb-4" style={{ border: "1px solid #2A2A38" }}>
-          <div className="px-4 py-3" style={{ background: "#1A1A22", borderBottom: "1px solid #2A2A38" }}>
+          <div className="px-4 py-3 flex items-center justify-between" style={{ background: "#1A1A22", borderBottom: "1px solid #2A2A38" }}>
             <h3 className="font-semibold text-sm">Conteúdos</h3>
+            <div className="flex gap-1">
+              {(["posts", "reels"] as const).map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setContentTab(t)}
+                  className="px-3 py-1 rounded-lg text-xs font-semibold uppercase transition-all"
+                  style={{
+                    background: contentTab === t ? "rgba(212,255,63,0.15)" : "transparent",
+                    color: contentTab === t ? "#D4FF3F" : "#6B7280",
+                  }}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
           </div>
-          <div className="grid grid-cols-4 gap-0.5" style={{ background: "#0B0B0F" }}>
-            {mockContents.map((c) => {
-              const st = statusConfig[c.status];
-              return (
-                <Link key={c.id} href={c.type === "reel" ? `/reels/${c.id}` : `/post/${c.id}`}>
-                  <div className="relative aspect-square overflow-hidden cursor-pointer hover:opacity-90 transition-all" style={{ background: "#1A1A22" }}>
-                    <img src={c.thumbnail} alt="" className="w-full h-full object-cover"/>
-                    <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.7) 100%)" }}/>
-                    {c.type === "reel" && (
-                      <div className="absolute top-2 right-2">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                      </div>
-                    )}
-                    <div className="absolute bottom-0 left-0 right-0 p-1.5">
-                      <span className="text-xs font-bold px-1.5 py-0.5 rounded-md" style={{ background: st.bg, color: st.color, fontSize: 9 }}>
-                        {st.label}
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-              );
-            })}
+          <div style={{ background: "#0B0B0F" }}>
+            <GridContent cols={4} />
           </div>
         </div>
 

@@ -1,10 +1,26 @@
 "use client";
 import Link from "next/link";
 import Logo from "./Logo";
-import { mockNotifications } from "@/lib/mock-data";
+import { useState, useEffect } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 export default function MobileTopBar() {
-  const unread = mockNotifications.filter((n) => !n.read).length;
+  const [unread, setUnread] = useState(0);
+
+  useEffect(() => {
+    const load = async () => {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { count } = await supabase
+        .from("notifications")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", user.id)
+        .eq("read", false);
+      setUnread(count ?? 0);
+    };
+    load();
+  }, []);
 
   return (
     <header

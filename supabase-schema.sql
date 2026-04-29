@@ -135,6 +135,7 @@ create table if not exists public.producao_items (
   status          text not null default 'aguardando' check (status in ('aguardando', 'em_revisao', 'aprovado', 'agendado')),
   images          jsonb default '[]'::jsonb,
   caption         text,
+  revisions       jsonb default '[]'::jsonb,
   scheduled_date  text,
   created_at      timestamptz default now(),
   updated_at      timestamptz default now()
