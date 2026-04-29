@@ -31,7 +31,29 @@ create policy "Users can delete their own media"
 
 
 -- ─────────────────────────────────────────
--- 2. CLEANUP TEST DATA
+-- 2. IDEAS TABLE
+-- ─────────────────────────────────────────
+create table if not exists public.ideas (
+  id          uuid primary key default gen_random_uuid(),
+  client_id   uuid not null references public.profiles(id) on delete cascade,
+  type        text not null default 'post',
+  text        text not null,
+  link        text,
+  images      text[] default '{}',
+  created_at  timestamptz default now()
+);
+
+alter table public.ideas enable row level security;
+
+create policy "Clients manage own ideas"
+  on public.ideas for all
+  to authenticated
+  using (client_id = auth.uid())
+  with check (client_id = auth.uid());
+
+
+-- ─────────────────────────────────────────
+-- 3. CLEANUP TEST DATA
 -- Deletes all rows from client tables so every
 -- account starts completely clean.
 -- ─────────────────────────────────────────

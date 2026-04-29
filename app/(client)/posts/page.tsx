@@ -58,9 +58,9 @@ export default function Posts() {
             onClick={() => setActiveStatus(s.key)}
             className="flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition-all"
             style={{
-              background: activeStatus === s.key ? "#D4FF3F" : "#1A1A22",
+              background: activeStatus === s.key ? "#D4FF3F" : "#0F0F1E",
               color: activeStatus === s.key ? "#0B0B0F" : "#9CA3AF",
-              border: activeStatus === s.key ? "none" : "1px solid #2A2A38",
+              border: activeStatus === s.key ? "none" : "1px solid #22223A",
             }}
           >
             {s.label}
@@ -71,7 +71,7 @@ export default function Posts() {
       {loading ? (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="aspect-square rounded-2xl animate-pulse" style={{ background: "#1A1A22" }} />
+            <div key={i} className="aspect-square rounded-2xl animate-pulse" style={{ background: "#0F0F1E" }} />
           ))}
         </div>
       ) : filtered.length === 0 ? (
@@ -88,7 +88,7 @@ export default function Posts() {
             const badge = statusBadge[c.status] ?? statusBadge.aguardando;
             return (
               <Link key={c.id} href={`/post/${c.id}`}>
-                <div className="relative aspect-square rounded-2xl overflow-hidden active:scale-[0.97] transition-transform" style={{ background: "#1A1A22" }}>
+                <div className="relative aspect-square rounded-2xl overflow-hidden active:scale-[0.97] transition-transform" style={{ background: "#0F0F1E" }}>
                   {thumbnail ? (
                     <img src={thumbnail} alt="" className="w-full h-full object-cover" />
                   ) : (

@@ -111,13 +111,13 @@ function LoginForm() {
               className="w-full px-4 py-3.5 rounded-2xl text-sm transition-all"
               style={{
                 background: "#131318",
-                border: "1.5px solid #2A2A38",
+                border: "1.5px solid #22223A",
                 color: "#fff",
                 fontSize: 15,
                 outline: "none",
               }}
               onFocus={(e) => { e.target.style.borderColor = `${accent}60`; e.target.style.boxShadow = `0 0 0 3px ${accent}12`; }}
-              onBlur={(e) => { e.target.style.borderColor = "#2A2A38"; e.target.style.boxShadow = "none"; }}
+              onBlur={(e) => { e.target.style.borderColor = "#22223A"; e.target.style.boxShadow = "none"; }}
             />
           </div>
 
@@ -135,13 +135,13 @@ function LoginForm() {
                 className="w-full px-4 py-3.5 rounded-2xl text-sm pr-12 transition-all"
                 style={{
                   background: "#131318",
-                  border: "1.5px solid #2A2A38",
+                  border: "1.5px solid #22223A",
                   color: "#fff",
                   fontSize: 15,
                   outline: "none",
                 }}
                 onFocus={(e) => { e.target.style.borderColor = `${accent}60`; e.target.style.boxShadow = `0 0 0 3px ${accent}12`; }}
-                onBlur={(e) => { e.target.style.borderColor = "#2A2A38"; e.target.style.boxShadow = "none"; }}
+                onBlur={(e) => { e.target.style.borderColor = "#22223A"; e.target.style.boxShadow = "none"; }}
               />
               <button
                 type="button"

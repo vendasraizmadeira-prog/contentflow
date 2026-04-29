@@ -261,9 +261,9 @@ export default function ReelsPage() {
   );
 
   const Timeline = () => (
-    <div className="px-4 py-3" style={{ background: "#1A1A22" }}>
+    <div className="px-4 py-3" style={{ background: "#0F0F1E" }}>
       <div className="relative cursor-pointer mb-3" style={{ height: 24 }} onClick={handleSeek}>
-        <div className="absolute top-1/2 -translate-y-1/2 w-full h-1.5 rounded-full" style={{ background: "#2A2A38" }} />
+        <div className="absolute top-1/2 -translate-y-1/2 w-full h-1.5 rounded-full" style={{ background: "#22223A" }} />
         <div className="absolute top-1/2 -translate-y-1/2 h-1.5 rounded-full" style={{ background: "#D4FF3F", width: duration > 0 ? `${(currentTime / duration) * 100}%` : "0%" }} />
         {duration > 0 && comments.map((c) => (
           <div key={c.id} onClick={(e) => { e.stopPropagation(); goToTime(c.time); }} className="absolute top-1/2 w-3 h-3 rounded-full cursor-pointer" style={{ left: `${(c.time / duration) * 100}%`, background: c.resolved ? "#22C55E" : "#7B4DFF", border: "2px solid #0B0B0F", transform: "translateY(-50%) translateX(-50%)" }} />
@@ -299,7 +299,7 @@ export default function ReelsPage() {
             {saving ? "Salvando..." : "Aprovar"}
           </button>
         )}
-        <button onClick={() => setShowChange(true)} disabled={saving} className="w-full py-4 rounded-2xl font-bold text-base active:scale-[0.97] transition-all disabled:opacity-60" style={{ border: "1px solid #2A2A38", color: "#fff" }}>
+        <button onClick={() => setShowChange(true)} disabled={saving} className="w-full py-4 rounded-2xl font-bold text-base active:scale-[0.97] transition-all disabled:opacity-60" style={{ border: "1px solid #22223A", color: "#fff" }}>
           Solicitar alteração
         </button>
         {pendingRequests.length > 0 && (
@@ -334,7 +334,7 @@ export default function ReelsPage() {
           <p className="text-xs font-medium mb-3" style={{ color: "#9CA3AF" }}>COMENTÁRIOS NO VÍDEO</p>
           <div className="flex flex-col gap-2">
             {comments.map((c) => (
-              <div key={c.id} onClick={() => goToTime(c.time)} className="flex items-center gap-3 rounded-xl p-3 active:opacity-70" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
+              <div key={c.id} onClick={() => goToTime(c.time)} className="flex items-center gap-3 rounded-xl p-3 active:opacity-70" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
                 <span className="text-xs font-mono font-bold flex-shrink-0" style={{ color: "#D4FF3F" }}>{formatTime(c.time)}</span>
                 <p className="text-sm flex-1" style={{ color: c.resolved ? "#6B7280" : "#fff", textDecoration: c.resolved ? "line-through" : "none" }}>{c.text}</p>
                 {!c.resolved && (
@@ -352,13 +352,13 @@ export default function ReelsPage() {
 
         {/* Add comment */}
         <div className="px-4 pb-3">
-          <div className="rounded-2xl p-3" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
+          <div className="rounded-2xl p-3" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
             <div className="flex items-center gap-2 mb-2">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#D4FF3F" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
               <span className="text-xs" style={{ color: "#D4FF3F" }}>+ Comentar em {formatTime(currentTime)}</span>
             </div>
             <div className="flex gap-2">
-              <input value={newComment} onChange={(e) => setNewComment(e.target.value)} placeholder="O que precisa mudar aqui?" className="flex-1 px-3 py-2 rounded-xl text-sm outline-none" style={{ background: "#0B0B0F", border: "1px solid #2A2A38", color: "#fff" }} onKeyDown={(e) => e.key === "Enter" && addComment()} />
+              <input value={newComment} onChange={(e) => setNewComment(e.target.value)} placeholder="O que precisa mudar aqui?" className="flex-1 px-3 py-2 rounded-xl text-sm outline-none" style={{ background: "#0B0B0F", border: "1px solid #22223A", color: "#fff" }} onKeyDown={(e) => e.key === "Enter" && addComment()} />
               <button onClick={addComment} className="px-3 py-2 rounded-xl text-sm font-medium" style={{ background: "#D4FF3F", color: "#0B0B0F" }}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
               </button>
@@ -376,11 +376,11 @@ export default function ReelsPage() {
       <div className="hidden md:block p-6 max-w-6xl mx-auto">
         <div className="grid grid-cols-2 gap-8">
           <div>
-            <div className="rounded-2xl overflow-hidden" style={{ border: "1px solid #2A2A38" }}>
+            <div className="rounded-2xl overflow-hidden" style={{ border: "1px solid #22223A" }}>
               <VideoPlayer vertical />
-              <div className="p-4" style={{ background: "#1A1A22" }}>
+              <div className="p-4" style={{ background: "#0F0F1E" }}>
                 <div className="relative cursor-pointer mb-3" style={{ height: 20 }} onClick={handleSeek}>
-                  <div className="absolute top-1/2 -translate-y-1/2 w-full h-1.5 rounded-full" style={{ background: "#2A2A38" }} />
+                  <div className="absolute top-1/2 -translate-y-1/2 w-full h-1.5 rounded-full" style={{ background: "#22223A" }} />
                   <div className="absolute top-1/2 -translate-y-1/2 h-1.5 rounded-full" style={{ background: "#D4FF3F", width: duration > 0 ? `${(currentTime / duration) * 100}%` : "0%" }} />
                   {comments.map((c) => (
                     <div key={c.id} onClick={(e) => { e.stopPropagation(); goToTime(c.time); }} className="absolute top-1/2 w-3 h-3 rounded-full cursor-pointer" style={{ left: duration > 0 ? `${(c.time / duration) * 100}%` : "0%", background: c.resolved ? "#22C55E" : "#7B4DFF", border: "2px solid #0B0B0F", transform: "translateY(-50%) translateX(-50%)" }} />
@@ -406,7 +406,7 @@ export default function ReelsPage() {
           </div>
 
           <div className="flex flex-col gap-4">
-            <div className="rounded-2xl p-5" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
+            <div className="rounded-2xl p-5" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
               <h3 className="font-semibold mb-4">Comentários no vídeo</h3>
               <div className="flex flex-col gap-2 mb-4 max-h-64 overflow-y-auto">
                 {comments.map((c) => (
@@ -418,7 +418,7 @@ export default function ReelsPage() {
                 ))}
                 {comments.length === 0 && <p className="text-xs" style={{ color: "#4B5563" }}>Nenhum comentário</p>}
               </div>
-              <div className="rounded-xl p-3" style={{ background: "#0B0B0F", border: "1px solid #2A2A38" }}>
+              <div className="rounded-xl p-3" style={{ background: "#0B0B0F", border: "1px solid #22223A" }}>
                 <p className="text-xs mb-2" style={{ color: "#D4FF3F" }}>+ Adicionar em {formatTime(currentTime)}</p>
                 <div className="flex gap-2">
                   <input value={newComment} onChange={(e) => setNewComment(e.target.value)} placeholder="Adicionar comentário..." className="flex-1 p-2 rounded-lg text-sm outline-none bg-transparent" style={{ color: "#fff" }} onKeyDown={(e) => e.key === "Enter" && addComment()} />
@@ -428,7 +428,7 @@ export default function ReelsPage() {
             </div>
 
             {content.revisions.length > 0 && (
-              <div className="rounded-2xl p-5" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
+              <div className="rounded-2xl p-5" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
                 <h3 className="font-semibold mb-3 text-sm">Histórico</h3>
                 <div className="flex flex-col gap-2">
                   {[...content.revisions].reverse().map((r) => {
@@ -458,13 +458,13 @@ export default function ReelsPage() {
       {/* Change request modal */}
       {showChange && (
         <div className="fixed inset-0 flex items-end md:items-center justify-center z-50" style={{ background: "rgba(0,0,0,0.85)" }}>
-          <div className="w-full md:max-w-md rounded-t-3xl md:rounded-2xl p-6 pb-10 md:pb-6" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
-            <div className="w-10 h-1 rounded-full mx-auto mb-4 md:hidden" style={{ background: "#2A2A38" }} />
+          <div className="w-full md:max-w-md rounded-t-3xl md:rounded-2xl p-6 pb-10 md:pb-6" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
+            <div className="w-10 h-1 rounded-full mx-auto mb-4 md:hidden" style={{ background: "#22223A" }} />
             <h3 className="font-bold mb-1">Solicitar alteração</h3>
             <p className="text-sm mb-4" style={{ color: "#6B7280" }}>Trecho: {formatTime(currentTime)} — Descreva o que precisa mudar</p>
-            <textarea value={changeText} onChange={(e) => setChangeText(e.target.value)} placeholder="Ex: Trocar esse take, colocar legenda maior..." rows={4} className="w-full px-3 py-2.5 rounded-2xl text-sm resize-none outline-none mb-4" style={{ background: "#0B0B0F", border: "1px solid #2A2A38", color: "#fff" }} autoFocus />
+            <textarea value={changeText} onChange={(e) => setChangeText(e.target.value)} placeholder="Ex: Trocar esse take, colocar legenda maior..." rows={4} className="w-full px-3 py-2.5 rounded-2xl text-sm resize-none outline-none mb-4" style={{ background: "#0B0B0F", border: "1px solid #22223A", color: "#fff" }} autoFocus />
             <div className="flex gap-3">
-              <button onClick={() => { setShowChange(false); setChangeText(""); }} className="flex-1 py-3 rounded-2xl text-sm" style={{ border: "1px solid #2A2A38", color: "#9CA3AF" }}>Cancelar</button>
+              <button onClick={() => { setShowChange(false); setChangeText(""); }} className="flex-1 py-3 rounded-2xl text-sm" style={{ border: "1px solid #22223A", color: "#9CA3AF" }}>Cancelar</button>
               <button onClick={handleChangeRequest} disabled={!changeText.trim() || saving} className="flex-1 py-3 rounded-2xl text-sm font-bold disabled:opacity-40" style={{ background: "#D4FF3F", color: "#0B0B0F" }}>
                 {saving ? "Enviando..." : "Enviar"}
               </button>

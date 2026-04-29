@@ -86,7 +86,7 @@ function NovaProducaoForm() {
       </p>
 
       {roteiroContent && (
-        <div className="rounded-2xl p-4 mb-4" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
+        <div className="rounded-2xl p-4 mb-4" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
           <p className="text-xs font-semibold mb-2" style={{ color: "#10B981" }}>ROTEIRO APROVADO (referência)</p>
           <p className="text-sm leading-relaxed whitespace-pre-wrap line-clamp-4" style={{ color: "#9CA3AF" }}>
             {roteiroContent}
@@ -94,7 +94,7 @@ function NovaProducaoForm() {
         </div>
       )}
 
-      <div className="rounded-2xl p-5 mb-4" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
+      <div className="rounded-2xl p-5 mb-4" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
         {(tipo === "post" || tipo === "carousel") && (
           <>
             <p className="text-xs font-semibold mb-3" style={{ color: "#9CA3AF" }}>FORMATO DO POST</p>
@@ -106,7 +106,7 @@ function NovaProducaoForm() {
                   className="flex-1 py-3 rounded-xl flex flex-col items-center gap-1.5 transition-all"
                   style={{
                     background: postSubtype === sub ? "rgba(123,77,255,0.15)" : "#0B0B0F",
-                    border: `1px solid ${postSubtype === sub ? "#7B4DFF" : "#2A2A38"}`,
+                    border: `1px solid ${postSubtype === sub ? "#7B4DFF" : "#22223A"}`,
                     color: postSubtype === sub ? "#7B4DFF" : "#6B7280",
                   }}
                 >
@@ -139,7 +139,7 @@ function NovaProducaoForm() {
                 </div>
               ))}
               {images.length < maxImages && (
-                <button onClick={() => imgRef.current?.click()} className="w-20 h-20 rounded-xl flex flex-col items-center justify-center gap-1 flex-shrink-0" style={{ background: "#0B0B0F", border: "1px dashed #2A2A38" }}>
+                <button onClick={() => imgRef.current?.click()} className="w-20 h-20 rounded-xl flex flex-col items-center justify-center gap-1 flex-shrink-0" style={{ background: "#0B0B0F", border: "1px dashed #22223A" }}>
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
                   <span className="text-xs" style={{ color: "#6B7280" }}>Adicionar</span>
                 </button>
@@ -152,7 +152,7 @@ function NovaProducaoForm() {
           <>
             <p className="text-xs font-semibold mb-3" style={{ color: "#9CA3AF" }}>ARQUIVO DE VÍDEO</p>
             <input ref={vidRef} type="file" accept="video/*" onChange={(e) => setVideoName(e.target.files?.[0]?.name ?? "")} className="hidden" />
-            <button onClick={() => vidRef.current?.click()} className="w-full py-8 rounded-2xl flex flex-col items-center gap-3 mb-4 transition-all" style={{ background: videoName ? "rgba(123,77,255,0.1)" : "#0B0B0F", border: `1px dashed ${videoName ? "#7B4DFF" : "#2A2A38"}` }}>
+            <button onClick={() => vidRef.current?.click()} className="w-full py-8 rounded-2xl flex flex-col items-center gap-3 mb-4 transition-all" style={{ background: videoName ? "rgba(123,77,255,0.1)" : "#0B0B0F", border: `1px dashed ${videoName ? "#7B4DFF" : "#22223A"}` }}>
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={videoName ? "#7B4DFF" : "#6B7280"} strokeWidth="2" strokeLinecap="round">
                 <path d="M15 10l4.553-2.069A1 1 0 0121 8.87v6.26a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/>
               </svg>
@@ -164,10 +164,10 @@ function NovaProducaoForm() {
         )}
 
         <p className="text-xs font-semibold mb-2" style={{ color: "#9CA3AF" }}>LEGENDA / DESCRIÇÃO</p>
-        <textarea value={caption} onChange={(e) => setCaption(e.target.value)} placeholder="Escreva a legenda que será publicada junto ao conteúdo..." rows={5} className="w-full px-4 py-3 rounded-xl text-sm resize-none outline-none mb-4" style={{ background: "#0B0B0F", border: "1px solid #2A2A38", color: "#fff" }} />
+        <textarea value={caption} onChange={(e) => setCaption(e.target.value)} placeholder="Escreva a legenda que será publicada junto ao conteúdo..." rows={5} className="w-full px-4 py-3 rounded-xl text-sm resize-none outline-none mb-4" style={{ background: "#0B0B0F", border: "1px solid #22223A", color: "#fff" }} />
 
         <p className="text-xs font-semibold mb-2" style={{ color: "#9CA3AF" }}>DATA DE PUBLICAÇÃO (opcional)</p>
-        <input type="date" value={scheduledDate} onChange={(e) => setScheduledDate(e.target.value)} className="w-full px-4 py-3 rounded-xl text-sm outline-none" style={{ background: "#0B0B0F", border: "1px solid #2A2A38", color: "#fff" }} />
+        <input type="date" value={scheduledDate} onChange={(e) => setScheduledDate(e.target.value)} className="w-full px-4 py-3 rounded-xl text-sm outline-none" style={{ background: "#0B0B0F", border: "1px solid #22223A", color: "#fff" }} />
       </div>
 
       <button onClick={submit} disabled={saving || (isImage && images.length === 0) || (isVideo && !videoName) || !caption.trim()} className="w-full py-4 rounded-2xl font-bold text-sm transition-all active:scale-[0.97] disabled:opacity-50" style={{ background: "#7B4DFF", color: "#fff" }}>

@@ -57,7 +57,7 @@ export default function NovoRoteiro() {
 
       <h1 className="text-xl font-bold mb-5">Novo Roteiro</h1>
 
-      <div className="rounded-2xl p-5 mb-4" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
+      <div className="rounded-2xl p-5 mb-4" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
         <p className="text-xs font-semibold mb-3" style={{ color: "#9CA3AF" }}>TIPO DE CONTEÚDO</p>
         <div className="grid grid-cols-4 gap-2 mb-5">
           {types.map((t) => (
@@ -67,7 +67,7 @@ export default function NovoRoteiro() {
               className="py-3 rounded-2xl flex flex-col items-center gap-1.5 transition-all active:scale-[0.96]"
               style={{
                 background: selectedType === t.key ? "rgba(123,77,255,0.15)" : "#0B0B0F",
-                border: `1px solid ${selectedType === t.key ? "#7B4DFF" : "#2A2A38"}`,
+                border: `1px solid ${selectedType === t.key ? "#7B4DFF" : "#22223A"}`,
                 color: selectedType === t.key ? "#7B4DFF" : "#6B7280",
               }}
             >
@@ -85,7 +85,7 @@ export default function NovoRoteiro() {
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Ex: Lançamento Nova Linha"
           className="w-full px-4 py-3 rounded-xl text-sm outline-none mb-4"
-          style={{ background: "#0B0B0F", border: "1px solid #2A2A38", color: "#fff" }}
+          style={{ background: "#0B0B0F", border: "1px solid #22223A", color: "#fff" }}
         />
 
         <p className="text-xs font-semibold mb-2" style={{ color: "#9CA3AF" }}>TEXTO DO ROTEIRO</p>
@@ -95,15 +95,15 @@ export default function NovoRoteiro() {
           placeholder="Escreva o roteiro completo aqui. Para carrosseis, indique os slides. Para reels, indique timestamps..."
           rows={12}
           className="w-full px-4 py-3 rounded-xl text-sm resize-none outline-none mb-4"
-          style={{ background: "#0B0B0F", border: "1px solid #2A2A38", color: "#fff" }}
+          style={{ background: "#0B0B0F", border: "1px solid #22223A", color: "#fff" }}
         />
 
         <button
           onClick={() => setSendNow(!sendNow)}
           className="flex items-center gap-3 w-full px-4 py-3 rounded-xl transition-all"
-          style={{ background: sendNow ? "rgba(123,77,255,0.12)" : "#0B0B0F", border: `1px solid ${sendNow ? "#7B4DFF" : "#2A2A38"}` }}
+          style={{ background: sendNow ? "rgba(123,77,255,0.12)" : "#0B0B0F", border: `1px solid ${sendNow ? "#7B4DFF" : "#22223A"}` }}
         >
-          <div className="w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0" style={{ background: sendNow ? "#7B4DFF" : "#2A2A38" }}>
+          <div className="w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0" style={{ background: sendNow ? "#7B4DFF" : "#22223A" }}>
             {sendNow && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round"><path d="M5 13l4 4L19 7"/></svg>}
           </div>
           <div className="text-left">

@@ -58,9 +58,9 @@ export default function ReelsList() {
             onClick={() => setActiveStatus(s.key)}
             className="flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition-all"
             style={{
-              background: activeStatus === s.key ? "#7B4DFF" : "#1A1A22",
+              background: activeStatus === s.key ? "#7B4DFF" : "#0F0F1E",
               color: activeStatus === s.key ? "#fff" : "#9CA3AF",
-              border: activeStatus === s.key ? "none" : "1px solid #2A2A38",
+              border: activeStatus === s.key ? "none" : "1px solid #22223A",
             }}
           >
             {s.label}
@@ -71,7 +71,7 @@ export default function ReelsList() {
       {loading ? (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="rounded-2xl animate-pulse" style={{ background: "#1A1A22", aspectRatio: "9/16" }} />
+            <div key={i} className="rounded-2xl animate-pulse" style={{ background: "#0F0F1E", aspectRatio: "9/16" }} />
           ))}
         </div>
       ) : filtered.length === 0 ? (
@@ -88,7 +88,7 @@ export default function ReelsList() {
             const badge = statusBadge[c.status] ?? statusBadge.aguardando;
             return (
               <Link key={c.id} href={`/reels/${c.id}`}>
-                <div className="relative rounded-2xl overflow-hidden active:scale-[0.97] transition-transform" style={{ background: "#1A1A22", aspectRatio: "9/16" }}>
+                <div className="relative rounded-2xl overflow-hidden active:scale-[0.97] transition-transform" style={{ background: "#0F0F1E", aspectRatio: "9/16" }}>
                   {thumbnail ? (
                     <img src={thumbnail} alt="" className="w-full h-full object-cover" />
                   ) : (

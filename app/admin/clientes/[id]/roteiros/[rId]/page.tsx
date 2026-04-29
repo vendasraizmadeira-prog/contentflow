@@ -120,7 +120,7 @@ export default function AdminRoteiroDetail() {
         </div>
       </div>
 
-      <div className="rounded-2xl p-4 mb-4" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
+      <div className="rounded-2xl p-4 mb-4" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
         <p className="text-xs font-semibold mb-3" style={{ color: "#9CA3AF" }}>TEXTO DO ROTEIRO</p>
         <textarea
           value={content}
@@ -137,7 +137,7 @@ export default function AdminRoteiroDetail() {
           disabled={saving}
           className="w-full py-3.5 rounded-2xl font-semibold text-sm transition-all active:scale-[0.97] disabled:opacity-60"
           style={{
-            background: saved ? "#10B981" : "#1A1A22",
+            background: saved ? "#10B981" : "#0F0F1E",
             color: saved ? "#fff" : "#7B4DFF",
             border: `1px solid ${saved ? "#10B981" : "#7B4DFF"}`,
           }}
@@ -185,7 +185,7 @@ export default function AdminRoteiroDetail() {
 
       <p className="text-xs font-semibold mb-4" style={{ color: "#9CA3AF" }}>HISTÓRICO DE ALTERAÇÕES</p>
       <div className="relative">
-        <div className="absolute left-3.5 top-0 bottom-0 w-px" style={{ background: "#2A2A38" }} />
+        <div className="absolute left-3.5 top-0 bottom-0 w-px" style={{ background: "#22223A" }} />
         <div className="flex flex-col gap-0">
           {history.map((entry) => {
             const { color: dc, icon } = dotStyle(entry.action);

@@ -125,7 +125,7 @@ export default function RoteiroDetail() {
   return (
     <div className="p-4 md:p-6 max-w-2xl">
       <div className="flex items-center gap-3 mb-5">
-        <button onClick={() => router.back()} className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
+        <button onClick={() => router.back()} className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
         </button>
         <div className="flex-1 min-w-0">
@@ -139,7 +139,7 @@ export default function RoteiroDetail() {
         </div>
       </div>
 
-      <div className="rounded-2xl p-4 mb-4" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
+      <div className="rounded-2xl p-4 mb-4" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
         <p className="text-xs font-semibold mb-3" style={{ color: "#9CA3AF" }}>TEXTO DO ROTEIRO</p>
         <textarea
           value={content}
@@ -154,7 +154,7 @@ export default function RoteiroDetail() {
         onClick={handleSave}
         disabled={saving}
         className="w-full py-3.5 rounded-2xl font-semibold text-sm mb-3 transition-all active:scale-[0.97] disabled:opacity-60"
-        style={{ background: saved ? "#10B981" : "#1A1A22", color: saved ? "#fff" : "#D4FF3F", border: `1px solid ${saved ? "#10B981" : "#D4FF3F"}` }}
+        style={{ background: saved ? "#10B981" : "#0F0F1E", color: saved ? "#fff" : "#D4FF3F", border: `1px solid ${saved ? "#10B981" : "#D4FF3F"}` }}
       >
         {saving ? "Salvando..." : saved ? "✓ Alterações salvas" : "Salvar alterações"}
       </button>
@@ -172,7 +172,7 @@ export default function RoteiroDetail() {
       <div className="mt-8">
         <p className="text-xs font-semibold mb-4" style={{ color: "#9CA3AF" }}>HISTÓRICO DE ALTERAÇÕES</p>
         <div className="relative">
-          <div className="absolute left-3.5 top-0 bottom-0 w-px" style={{ background: "#2A2A38" }} />
+          <div className="absolute left-3.5 top-0 bottom-0 w-px" style={{ background: "#22223A" }} />
           <div className="flex flex-col gap-0">
             {history.map((entry) => {
               const { color: dotColor, icon } = actionIcon(entry.action);

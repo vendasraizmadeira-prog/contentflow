@@ -64,7 +64,7 @@ export default function Producao() {
     return (
       <div className="p-4 md:p-6 max-w-2xl">
         <div className="flex flex-col gap-3 mt-8">
-          {[1, 2, 3].map(i => <div key={i} className="rounded-2xl animate-pulse" style={{ background: "#1A1A22", height: 80 }} />)}
+          {[1, 2, 3].map(i => <div key={i} className="rounded-2xl animate-pulse" style={{ background: "#0F0F1E", height: 80 }} />)}
         </div>
       </div>
     );
@@ -121,12 +121,12 @@ export default function Producao() {
                   const tc = typeColor[item.type] ?? "#7B4DFF";
                   return (
                     <Link key={item.id} href={`/admin/clientes/${id}/producao/novo?roteiroId=${item.roteiro_id ?? ""}&tipo=${item.type}&titulo=${encodeURIComponent(item.roteiro_title)}&itemId=${item.id}`}>
-                      <div className="rounded-2xl p-4 transition-all active:scale-[0.98]" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
+                      <div className="rounded-2xl p-4 transition-all active:scale-[0.98]" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
                         <div className="flex items-start gap-3">
                           {item.images[0] ? (
                             <img src={item.images[0]} alt="" className="w-14 h-14 rounded-xl object-cover flex-shrink-0" />
                           ) : (
-                            <div className="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "#0B0B0F", border: "1px dashed #2A2A38" }}>
+                            <div className="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "#0B0B0F", border: "1px dashed #22223A" }}>
                               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4B5563" strokeWidth="2" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
                             </div>
                           )}

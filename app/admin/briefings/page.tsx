@@ -88,10 +88,10 @@ export default function Briefings() {
 
         {loadingAnswers ? (
           <div className="flex flex-col gap-3">
-            {[1, 2, 3].map(i => <div key={i} className="rounded-2xl animate-pulse" style={{ background: "#1A1A22", height: 80 }} />)}
+            {[1, 2, 3].map(i => <div key={i} className="rounded-2xl animate-pulse" style={{ background: "#0F0F1E", height: 80 }} />)}
           </div>
         ) : answers.length > 0 ? (
-          <div className="rounded-2xl p-4" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
+          <div className="rounded-2xl p-4" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
             <div className="flex flex-col gap-4">
               {Object.entries(BRIEFING_LABELS).map(([key, label]) =>
                 answersMap[key] ? (
@@ -119,7 +119,7 @@ export default function Briefings() {
 
       {loading ? (
         <div className="flex flex-col gap-3">
-          {[1, 2, 3].map(i => <div key={i} className="rounded-2xl animate-pulse" style={{ background: "#1A1A22", height: 80 }} />)}
+          {[1, 2, 3].map(i => <div key={i} className="rounded-2xl animate-pulse" style={{ background: "#0F0F1E", height: 80 }} />)}
         </div>
       ) : clients.length === 0 ? (
         <div className="text-center py-12" style={{ color: "#6B7280" }}>
@@ -128,7 +128,7 @@ export default function Briefings() {
       ) : (
         <div className="flex flex-col gap-3">
           {clients.map((c) => (
-            <div key={c.id} className="rounded-2xl p-4" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
+            <div key={c.id} className="rounded-2xl p-4" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
               <div className="flex items-center gap-3">
                 {c.avatar ? (
                   <img src={c.avatar} alt="" className="w-11 h-11 rounded-full object-cover flex-shrink-0" />

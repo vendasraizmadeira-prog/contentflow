@@ -183,16 +183,16 @@ export default function PerfilEditor() {
       <div className="flex flex-col lg:flex-row gap-5">
         {/* Form */}
         <div className="flex-1">
-          <div className="rounded-2xl p-5" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
+          <div className="rounded-2xl p-5" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
 
             {/* Avatar */}
             <p className="text-xs font-semibold mb-3" style={{ color: "#9CA3AF" }}>FOTO DE PERFIL</p>
             <div className="flex items-center gap-4 mb-5">
               <div className="relative flex-shrink-0">
                 {avatar ? (
-                  <img src={avatar} alt="" className="w-20 h-20 rounded-full object-cover" style={{ border: "2px solid #2A2A38" }} />
+                  <img src={avatar} alt="" className="w-20 h-20 rounded-full object-cover" style={{ border: "2px solid #22223A" }} />
                 ) : (
-                  <div className="w-20 h-20 rounded-full flex items-center justify-center text-2xl font-bold" style={{ background: "#7B4DFF22", color: "#7B4DFF", border: "2px solid #2A2A38" }}>
+                  <div className="w-20 h-20 rounded-full flex items-center justify-center text-2xl font-bold" style={{ background: "#7B4DFF22", color: "#7B4DFF", border: "2px solid #22223A" }}>
                     {displayName.charAt(0) || "?"}
                   </div>
                 )}
@@ -221,7 +221,7 @@ export default function PerfilEditor() {
                   onChange={(e) => f.set(e.target.value)}
                   placeholder={f.placeholder}
                   className="w-full px-4 py-3 rounded-xl text-sm outline-none"
-                  style={{ background: "#0B0B0F", border: "1px solid #2A2A38", color: "#fff" }}
+                  style={{ background: "#0B0B0F", border: "1px solid #22223A", color: "#fff" }}
                 />
               </div>
             ))}
@@ -240,7 +240,7 @@ export default function PerfilEditor() {
                     value={f.value}
                     onChange={(e) => f.set(Number(e.target.value))}
                     className="w-full px-3 py-3 rounded-xl text-sm outline-none"
-                    style={{ background: "#0B0B0F", border: "1px solid #2A2A38", color: "#fff" }}
+                    style={{ background: "#0B0B0F", border: "1px solid #22223A", color: "#fff" }}
                   />
                 </div>
               ))}
@@ -259,7 +259,7 @@ export default function PerfilEditor() {
                 rows={4}
                 placeholder={"Emojis e linhas funcionam!\n💚 Sobre a marca\n📍 Localização\n👇 CTA"}
                 className="w-full px-4 py-3 rounded-xl text-sm resize-none outline-none"
-                style={{ background: "#0B0B0F", border: "1px solid #2A2A38", color: "#fff" }}
+                style={{ background: "#0B0B0F", border: "1px solid #22223A", color: "#fff" }}
               />
             </div>
 
@@ -273,7 +273,7 @@ export default function PerfilEditor() {
                     <div key={h.id} className="flex flex-col items-center gap-1">
                       <div className="relative">
                         <label htmlFor={`hl-cover-${h.id}`} className="block cursor-pointer">
-                          <div className="w-14 h-14 rounded-full overflow-hidden" style={{ border: "2px solid #2A2A38" }}>
+                          <div className="w-14 h-14 rounded-full overflow-hidden" style={{ border: "2px solid #22223A" }}>
                             <img src={h.cover} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
                           </div>
                           <div className="absolute bottom-0 right-0 w-5 h-5 rounded-full flex items-center justify-center" style={{ background: "#7B4DFF" }}>
@@ -305,7 +305,7 @@ export default function PerfilEditor() {
                   <label
                     htmlFor="new-hl-cover"
                     className="w-12 h-12 rounded-full flex items-center justify-center overflow-hidden cursor-pointer"
-                    style={{ background: newHLCover ? "transparent" : "#0B0B0F", border: `2px dashed ${newHLCover ? "#7B4DFF" : "#2A2A38"}` }}
+                    style={{ background: newHLCover ? "transparent" : "#0B0B0F", border: `2px dashed ${newHLCover ? "#7B4DFF" : "#22223A"}` }}
                   >
                     {newHLCover ? (
                       <img src={newHLCover} alt="" className="w-full h-full object-cover rounded-full" />
@@ -321,7 +321,7 @@ export default function PerfilEditor() {
                   onKeyDown={(e) => e.key === "Enter" && addHL()}
                   placeholder="Título do destaque"
                   className="flex-1 px-3 py-2.5 rounded-xl text-sm outline-none"
-                  style={{ background: "#0B0B0F", border: "1px solid #2A2A38", color: "#fff" }}
+                  style={{ background: "#0B0B0F", border: "1px solid #22223A", color: "#fff" }}
                 />
                 <button onClick={addHL} className="px-4 py-2.5 rounded-xl text-sm font-semibold flex-shrink-0" style={{ background: "#7B4DFF", color: "#fff" }}>
                   Adicionar
@@ -347,7 +347,7 @@ export default function PerfilEditor() {
         {/* Preview */}
         <div className="lg:w-80 flex-shrink-0">
           <p className="text-xs font-semibold mb-3" style={{ color: "#9CA3AF" }}>PRÉVIA DO PERFIL</p>
-          <div className="rounded-2xl overflow-hidden" style={{ background: "#000", border: "1px solid #2A2A38" }}>
+          <div className="rounded-2xl overflow-hidden" style={{ background: "#000", border: "1px solid #22223A" }}>
             <div className="flex items-center justify-between px-4 pt-3 pb-2">
               <span className="text-sm font-bold text-white">@{username || "username"}</span>
               <div className="flex gap-3">
@@ -361,7 +361,7 @@ export default function PerfilEditor() {
                 {avatar ? (
                   <img src={avatar} alt="" className="w-20 h-20 rounded-full object-cover flex-shrink-0" style={{ border: "2px solid #333" }} />
                 ) : (
-                  <div className="w-20 h-20 rounded-full flex items-center justify-center text-2xl font-bold flex-shrink-0" style={{ background: "#1A1A22", color: "#7B4DFF", border: "2px solid #333" }}>
+                  <div className="w-20 h-20 rounded-full flex items-center justify-center text-2xl font-bold flex-shrink-0" style={{ background: "#0F0F1E", color: "#7B4DFF", border: "2px solid #333" }}>
                     {displayName.charAt(0) || "?"}
                   </div>
                 )}
@@ -386,7 +386,7 @@ export default function PerfilEditor() {
                 <div className="flex gap-3 mt-3 overflow-x-auto pb-1">
                   {highlights.slice(0, 5).map((h) => (
                     <div key={h.id} className="flex flex-col items-center gap-1 flex-shrink-0">
-                      <div className="w-14 h-14 rounded-full overflow-hidden" style={{ border: "2px solid #333", background: "#1A1A22" }}>
+                      <div className="w-14 h-14 rounded-full overflow-hidden" style={{ border: "2px solid #333", background: "#0F0F1E" }}>
                         <img src={h.cover} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
                       </div>
                       <p className="text-xs text-white text-center truncate w-14">{h.title}</p>

@@ -64,13 +64,13 @@ export default function Roteiros() {
               onClick={() => setFilter(tab)}
               className="px-5 py-2 rounded-full text-sm font-semibold transition-all"
               style={{
-                background: filter === tab ? "#D4FF3F" : "#1A1A22",
+                background: filter === tab ? "#D4FF3F" : "#0F0F1E",
                 color: filter === tab ? "#0B0B0F" : "#9CA3AF",
-                border: filter === tab ? "none" : "1px solid #2A2A38",
+                border: filter === tab ? "none" : "1px solid #22223A",
               }}
             >
               {tab === "pendente" ? "Pendentes" : "Revisados"}
-              <span className="ml-2 text-xs font-bold px-1.5 py-0.5 rounded-full" style={{ background: filter === tab ? "rgba(0,0,0,0.15)" : "#2A2A38", color: filter === tab ? "#0B0B0F" : "#6B7280" }}>
+              <span className="ml-2 text-xs font-bold px-1.5 py-0.5 rounded-full" style={{ background: filter === tab ? "rgba(0,0,0,0.15)" : "#22223A", color: filter === tab ? "#0B0B0F" : "#6B7280" }}>
                 {count}
               </span>
             </button>
@@ -80,7 +80,7 @@ export default function Roteiros() {
 
       {loading ? (
         <div className="flex flex-col gap-3">
-          {[1, 2, 3].map((i) => <div key={i} className="rounded-2xl animate-pulse" style={{ background: "#1A1A22", height: 110 }} />)}
+          {[1, 2, 3].map((i) => <div key={i} className="rounded-2xl animate-pulse" style={{ background: "#0F0F1E", height: 110 }} />)}
         </div>
       ) : filtered.length === 0 ? (
         <div className="text-center py-16" style={{ color: "#6B7280" }}>
@@ -97,7 +97,7 @@ export default function Roteiros() {
             const preview = (r.content ?? "").slice(0, 120).replace(/\n/g, " ") + ((r.content ?? "").length > 120 ? "…" : "");
             return (
               <Link key={r.id} href={`/roteiros/${r.id}`}>
-                <div className="rounded-2xl p-4 transition-all active:scale-[0.98]" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
+                <div className="rounded-2xl p-4 transition-all active:scale-[0.98]" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
                   <div className="flex items-start justify-between gap-3 mb-2">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: `${color}22`, color }}>
@@ -111,7 +111,7 @@ export default function Roteiros() {
                   </div>
                   <p className="font-semibold mb-1.5">{r.title}</p>
                   <p className="text-sm leading-relaxed" style={{ color: "#9CA3AF" }}>{preview}</p>
-                  <div className="flex items-center justify-between mt-3 pt-3" style={{ borderTop: "1px solid #2A2A38" }}>
+                  <div className="flex items-center justify-between mt-3 pt-3" style={{ borderTop: "1px solid #22223A" }}>
                     <span className="text-xs" style={{ color: "#6B7280" }}>
                       {new Date(r.created_at).toLocaleDateString("pt-BR")}
                     </span>

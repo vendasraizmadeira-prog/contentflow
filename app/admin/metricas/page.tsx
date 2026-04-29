@@ -46,10 +46,10 @@ export default function AdminMetricas() {
           <p className="text-sm mt-0.5" style={{ color: "#6B7280" }}>Visão geral das métricas</p>
         </div>
         <div className="flex items-center gap-3">
-          <select value={selectedId} onChange={e => setSelectedId(e.target.value)} className="px-3 py-2 rounded-xl text-sm outline-none" style={{ background: "#1A1A22", border: "1px solid #2A2A38", color: "#fff" }}>
+          <select value={selectedId} onChange={e => setSelectedId(e.target.value)} className="px-3 py-2 rounded-xl text-sm outline-none" style={{ background: "#0F0F1E", border: "1px solid #22223A", color: "#fff" }}>
             {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
-          <select value={period} onChange={e => setPeriod(e.target.value)} className="px-3 py-2 rounded-xl text-sm outline-none" style={{ background: "#1A1A22", border: "1px solid #2A2A38", color: "#fff" }}>
+          <select value={period} onChange={e => setPeriod(e.target.value)} className="px-3 py-2 rounded-xl text-sm outline-none" style={{ background: "#0F0F1E", border: "1px solid #22223A", color: "#fff" }}>
             <option value="7">Últimos 7 dias</option>
             <option value="30">Últimos 30 dias</option>
             <option value="90">Últimos 90 dias</option>
@@ -59,7 +59,7 @@ export default function AdminMetricas() {
 
       {loading ? (
         <div className="flex flex-col gap-4">
-          {[1,2,3].map(i => <div key={i} className="rounded-2xl animate-pulse" style={{ background: "#1A1A22", height: 100 }} />)}
+          {[1,2,3].map(i => <div key={i} className="rounded-2xl animate-pulse" style={{ background: "#0F0F1E", height: 100 }} />)}
         </div>
       ) : clients.length === 0 ? (
         <div className="text-center py-16" style={{ color: "#6B7280" }}>
@@ -73,7 +73,7 @@ export default function AdminMetricas() {
               { label: "Seguindo", value: String(client?.following ?? 0), growth: "—", color: "#7B4DFF" },
               { label: "Posts", value: String(client?.posts ?? 0), growth: "—", color: "#22C55E" },
             ].map(s => (
-              <div key={s.label} className="rounded-2xl p-5" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
+              <div key={s.label} className="rounded-2xl p-5" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
                 <p className="text-xs mb-1" style={{ color: "#6B7280" }}>{s.label}</p>
                 <p className="text-2xl font-bold">{s.value}</p>
                 <p className="text-xs mt-1" style={{ color: s.color }}>{s.growth !== "—" ? `${s.growth} vs mês anterior` : "—"}</p>
@@ -81,7 +81,7 @@ export default function AdminMetricas() {
             ))}
           </div>
 
-          <div className="rounded-2xl p-5 mb-4" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
+          <div className="rounded-2xl p-5 mb-4" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
             <h3 className="font-semibold mb-4">Crescimento de Seguidores — {client?.name}</h3>
             <svg viewBox={`0 0 ${chartW} ${chartH}`} className="w-full" style={{ height: 160 }}>
               <defs>
@@ -101,11 +101,11 @@ export default function AdminMetricas() {
             </svg>
           </div>
 
-          <div className="rounded-2xl p-5" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
+          <div className="rounded-2xl p-5" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
             <h3 className="font-semibold mb-4">Visão geral — Todos os clientes</h3>
             <div className="grid grid-cols-2 gap-3">
               {clients.map(c => (
-                <button key={c.id} onClick={() => setSelectedId(c.id)} className="rounded-xl p-4 flex items-center gap-3 text-left transition-all" style={{ background: selectedId === c.id ? "rgba(212,255,63,0.08)" : "#0B0B0F", border: `1px solid ${selectedId === c.id ? "#D4FF3F44" : "#2A2A38"}` }}>
+                <button key={c.id} onClick={() => setSelectedId(c.id)} className="rounded-xl p-4 flex items-center gap-3 text-left transition-all" style={{ background: selectedId === c.id ? "rgba(212,255,63,0.08)" : "#0B0B0F", border: `1px solid ${selectedId === c.id ? "#D4FF3F44" : "#22223A"}` }}>
                   {c.avatar ? (
                     <img src={c.avatar} alt="" className="w-9 h-9 rounded-full object-cover flex-shrink-0"/>
                   ) : (

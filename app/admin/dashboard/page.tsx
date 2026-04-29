@@ -91,14 +91,14 @@ export default function AdminDashboard() {
           { label: "Aprovações Pendentes", value: statusCounts.aprovado, icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z", color: "#22C55E" },
           { label: "Posts Agendados", value: statusCounts.agendado, icon: "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z", color: "#818CF8" },
         ].map(k => (
-          <div key={k.label} className="rounded-2xl p-5" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
+          <div key={k.label} className="rounded-2xl p-5" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
             <div className="flex items-start justify-between mb-3">
               <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${k.color}20` }}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={k.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={k.icon}/></svg>
               </div>
             </div>
             {loading ? (
-              <div className="h-9 w-16 rounded-lg animate-pulse" style={{ background: "#2A2A38" }} />
+              <div className="h-9 w-16 rounded-lg animate-pulse" style={{ background: "#22223A" }} />
             ) : (
               <p className="text-3xl font-bold">{k.value}</p>
             )}
@@ -109,10 +109,10 @@ export default function AdminDashboard() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Donut chart */}
-        <div className="rounded-2xl p-5" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
+        <div className="rounded-2xl p-5" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
           <h3 className="font-semibold mb-4">Conteúdos por Status</h3>
           {loading ? (
-            <div className="h-24 animate-pulse rounded-xl" style={{ background: "#2A2A38" }} />
+            <div className="h-24 animate-pulse rounded-xl" style={{ background: "#22223A" }} />
           ) : (
             <div className="flex items-center gap-6">
               <div className="relative" style={{ width: 100, height: 100 }}>
@@ -149,7 +149,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Quick links */}
-        <div className="rounded-2xl p-5" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
+        <div className="rounded-2xl p-5" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
           <h3 className="font-semibold mb-4">Acesso Rápido</h3>
           <div className="flex flex-col gap-2">
             {[
@@ -159,7 +159,7 @@ export default function AdminDashboard() {
               { label: "Métricas", href: "/admin/metricas", color: "#FBBF24", icon: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" },
             ].map(item => (
               <Link key={item.href} href={item.href}>
-                <div className="flex items-center gap-3 p-3 rounded-xl transition-all hover:opacity-80" style={{ background: "#0B0B0F", border: "1px solid #2A2A38" }}>
+                <div className="flex items-center gap-3 p-3 rounded-xl transition-all hover:opacity-80" style={{ background: "#0B0B0F", border: "1px solid #22223A" }}>
                   <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: `${item.color}20` }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={item.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={item.icon}/></svg>
                   </div>
@@ -172,14 +172,14 @@ export default function AdminDashboard() {
         </div>
 
         {/* Recordings */}
-        <div className="rounded-2xl p-5" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
+        <div className="rounded-2xl p-5" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
           <div className="flex justify-between items-center mb-4">
             <h3 className="font-semibold">Próximas gravações</h3>
             <Link href="/admin/gravacoes"><span className="text-xs" style={{ color: "#7B4DFF" }}>Ver calendário</span></Link>
           </div>
           {loading ? (
             <div className="flex flex-col gap-3">
-              {[1,2,3].map(i => <div key={i} className="h-10 rounded-xl animate-pulse" style={{ background: "#2A2A38" }} />)}
+              {[1,2,3].map(i => <div key={i} className="h-10 rounded-xl animate-pulse" style={{ background: "#22223A" }} />)}
             </div>
           ) : recordings.length === 0 ? (
             <p className="text-xs text-center py-8" style={{ color: "#4B5563" }}>Nenhuma gravação agendada</p>

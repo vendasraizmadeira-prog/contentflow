@@ -72,11 +72,11 @@ export default function Conteudos() {
 
       {loading ? (
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-          {[1, 2, 3, 4].map((i) => <div key={i} className="rounded-2xl animate-pulse" style={{ background: "#1A1A22", height: 200 }} />)}
+          {[1, 2, 3, 4].map((i) => <div key={i} className="rounded-2xl animate-pulse" style={{ background: "#0F0F1E", height: 200 }} />)}
         </div>
       ) : filtered.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 gap-3">
-          <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{ background: "#1A1A22" }}>
+          <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{ background: "#0F0F1E" }}>
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#4B5563" strokeWidth="1.5" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
           </div>
           <p className="font-semibold" style={{ color: "#6B7280" }}>Nenhum conteúdo ainda</p>
@@ -90,7 +90,7 @@ export default function Conteudos() {
             const href = c.type === "reel" ? `/reels/${c.id}` : `/post/${c.id}`;
             return (
               <Link key={c.id} href={href}>
-                <div className="rounded-2xl overflow-hidden active:scale-[0.98] md:hover:scale-[1.01] transition-all cursor-pointer" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
+                <div className="rounded-2xl overflow-hidden active:scale-[0.98] md:hover:scale-[1.01] transition-all cursor-pointer" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
                   <div className="relative" style={{ height: 140 }}>
                     {thumbnail ? (
                       <img src={thumbnail} alt="" className="w-full h-full object-cover" />
@@ -132,8 +132,8 @@ export default function Conteudos() {
           })}
 
           <Link href="/ideias">
-            <div className="rounded-2xl flex flex-col items-center justify-center p-4 active:opacity-70 transition-all" style={{ background: "#1A1A22", border: "2px dashed #2A2A38", minHeight: 200 }}>
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2A2A38" strokeWidth="1.5" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            <div className="rounded-2xl flex flex-col items-center justify-center p-4 active:opacity-70 transition-all" style={{ background: "#0F0F1E", border: "2px dashed #22223A", minHeight: 200 }}>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#22223A" strokeWidth="1.5" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
               <p className="text-xs mt-2 text-center" style={{ color: "#4B5563" }}>Enviar ideia ou referência</p>
             </div>
           </Link>

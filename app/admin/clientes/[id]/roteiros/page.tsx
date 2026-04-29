@@ -86,9 +86,9 @@ export default function ClienteRoteiros() {
               onClick={() => setFilter(f.key)}
               className="flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition-all"
               style={{
-                background: filter === f.key ? "#7B4DFF" : "#1A1A22",
+                background: filter === f.key ? "#7B4DFF" : "#0F0F1E",
                 color: filter === f.key ? "#fff" : "#9CA3AF",
-                border: filter === f.key ? "none" : "1px solid #2A2A38",
+                border: filter === f.key ? "none" : "1px solid #22223A",
               }}
             >
               {f.label} <span className="ml-1 opacity-70 text-xs">({count})</span>
@@ -99,7 +99,7 @@ export default function ClienteRoteiros() {
 
       {loading ? (
         <div className="flex flex-col gap-3">
-          {[1, 2, 3].map(i => <div key={i} className="rounded-2xl animate-pulse" style={{ background: "#1A1A22", height: 110 }} />)}
+          {[1, 2, 3].map(i => <div key={i} className="rounded-2xl animate-pulse" style={{ background: "#0F0F1E", height: 110 }} />)}
         </div>
       ) : filtered.length === 0 ? (
         <div className="text-center py-14" style={{ color: "#6B7280" }}>
@@ -109,7 +109,7 @@ export default function ClienteRoteiros() {
         <div className="flex flex-col gap-3">
           {filtered.map((r) => (
             <Link key={r.id} href={`/admin/clientes/${id}/roteiros/${r.id}`}>
-              <div className="rounded-2xl p-4 transition-all active:scale-[0.98]" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
+              <div className="rounded-2xl p-4 transition-all active:scale-[0.98]" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
                 <div className="flex items-start justify-between gap-3 mb-2">
                   <div className="flex gap-2 flex-wrap">
                     <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: `${typeColor[r.type] ?? "#7B4DFF"}22`, color: typeColor[r.type] ?? "#7B4DFF" }}>
@@ -125,7 +125,7 @@ export default function ClienteRoteiros() {
                 </div>
                 <p className="font-semibold mb-1">{r.title}</p>
                 <p className="text-sm" style={{ color: "#9CA3AF" }}>{(r.content ?? "").slice(0, 100).replace(/\n/g, " ")}…</p>
-                <div className="flex items-center justify-between mt-3 pt-3" style={{ borderTop: "1px solid #2A2A38" }}>
+                <div className="flex items-center justify-between mt-3 pt-3" style={{ borderTop: "1px solid #22223A" }}>
                   <span className="text-xs" style={{ color: "#6B7280" }}>
                     {new Date(r.created_at).toLocaleDateString("pt-BR")}
                   </span>

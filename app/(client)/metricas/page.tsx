@@ -88,7 +88,7 @@ export default function Metricas() {
       return (
         <div className="grid gap-0.5" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="aspect-square animate-pulse" style={{ background: "#1A1A22" }} />
+            <div key={i} className="aspect-square animate-pulse" style={{ background: "#0F0F1E" }} />
           ))}
         </div>
       );
@@ -97,7 +97,7 @@ export default function Metricas() {
     if (filteredContents.length === 0) {
       return (
         <div className="flex flex-col items-center justify-center py-16 gap-3">
-          <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{ background: "#1A1A22" }}>
+          <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{ background: "#0F0F1E" }}>
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#4B5563" strokeWidth="1.5" strokeLinecap="round">
               <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>
             </svg>
@@ -116,11 +116,11 @@ export default function Metricas() {
           const href = c.type === "reel" ? `/reels/${c.id}` : `/post/${c.id}`;
           return (
             <Link key={c.id} href={href}>
-              <div className="relative aspect-square overflow-hidden" style={{ background: "#1A1A22" }}>
+              <div className="relative aspect-square overflow-hidden" style={{ background: "#0F0F1E" }}>
                 {thumbnail ? (
                   <img src={thumbnail} alt="" className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center" style={{ background: "#1A1A22" }}>
+                  <div className="w-full h-full flex items-center justify-center" style={{ background: "#0F0F1E" }}>
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4B5563" strokeWidth="1.5" strokeLinecap="round">
                       <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>
                     </svg>
@@ -177,7 +177,7 @@ export default function Metricas() {
         <div className="px-4 pt-2 pb-3" style={{ background: "#0F0F17", borderBottom: "1px solid #1E1E2A" }}>
           <div className="flex items-center gap-3">
             <span className="text-xs font-medium whitespace-nowrap" style={{ color: "#6B7280" }}>Perfil Aquecido</span>
-            <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: "#2A2A38" }}>
+            <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: "#22223A" }}>
               <div className="h-2 rounded-full" style={{ width: `${warmthScore}%`, background: "linear-gradient(90deg, #4B5563 10%, #D4FF3F 100%)" }} />
             </div>
             <span className="text-xs font-bold" style={{ color: "#D4FF3F" }}>{warmthScore}%</span>
@@ -191,7 +191,7 @@ export default function Metricas() {
                 {avatar ? (
                   <img src={avatar} alt="" className="w-full h-full rounded-full object-cover" style={{ border: "2px solid #0B0B0F" }} />
                 ) : (
-                  <div className="w-full h-full rounded-full flex items-center justify-center text-2xl font-bold" style={{ background: "#1A1A22", color: "#D4FF3F", border: "2px solid #0B0B0F" }}>
+                  <div className="w-full h-full rounded-full flex items-center justify-center text-2xl font-bold" style={{ background: "#0F0F1E", color: "#D4FF3F", border: "2px solid #0B0B0F" }}>
                     {name.charAt(0)}
                   </div>
                 )}
@@ -256,14 +256,14 @@ export default function Metricas() {
                 { label: "Alcance", value: "—", sub: "dados em breve", color: "#D4FF3F" },
                 { label: "Engajamento", value: "—", sub: "dados em breve", color: "#7B4DFF" },
               ].map((s) => (
-                <div key={s.label} className="rounded-2xl p-3" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
+                <div key={s.label} className="rounded-2xl p-3" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
                   <p className="text-xs mb-1" style={{ color: "#6B7280" }}>{s.label}</p>
                   <p className="text-xl font-bold">{s.value}</p>
                   <p className="text-xs mt-1 leading-tight" style={{ color: s.color }}>{s.sub}</p>
                 </div>
               ))}
             </div>
-            <div className="rounded-2xl p-4" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
+            <div className="rounded-2xl p-4" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
               <div className="flex justify-between items-center mb-3">
                 <p className="font-semibold text-sm">Status do Perfil</p>
                 <span className="text-sm font-bold" style={{ color: "#D4FF3F" }}>{warmthScore}%</span>
@@ -274,7 +274,7 @@ export default function Metricas() {
                   Perfil Aquecido
                 </span>
               </div>
-              <div className="w-full rounded-full h-3 overflow-hidden" style={{ background: "#2A2A38" }}>
+              <div className="w-full rounded-full h-3 overflow-hidden" style={{ background: "#22223A" }}>
                 <div className="h-3 rounded-full" style={{ width: `${warmthScore}%`, background: "linear-gradient(90deg, #4B5563 0%, #D4FF3F 100%)" }}/>
               </div>
             </div>
@@ -289,12 +289,12 @@ export default function Metricas() {
           <p className="text-sm mt-0.5" style={{ color: "#6B7280" }}>Acompanhe o crescimento do seu perfil</p>
         </div>
 
-        <div className="rounded-2xl p-5 mb-4 flex items-center gap-5" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
+        <div className="rounded-2xl p-5 mb-4 flex items-center gap-5" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
           <div className="w-16 h-16 rounded-full p-0.5 flex-shrink-0" style={{ background: "linear-gradient(135deg, #D4FF3F, #90FF40)" }}>
             {avatar ? (
               <img src={avatar} alt="" className="w-full h-full rounded-full object-cover" style={{ border: "2px solid #0B0B0F" }}/>
             ) : (
-              <div className="w-full h-full rounded-full flex items-center justify-center text-2xl font-bold" style={{ background: "#1A1A22", color: "#D4FF3F", border: "2px solid #0B0B0F" }}>
+              <div className="w-full h-full rounded-full flex items-center justify-center text-2xl font-bold" style={{ background: "#0F0F1E", color: "#D4FF3F", border: "2px solid #0B0B0F" }}>
                 {name.charAt(0)}
               </div>
             )}
@@ -327,7 +327,7 @@ export default function Metricas() {
             { label: "Alcance", value: "—", sub: "dados em breve", color: "#D4FF3F" },
             { label: "Engajamento", value: "—", sub: "dados em breve", color: "#7B4DFF" },
           ].map((s) => (
-            <div key={s.label} className="rounded-2xl p-5" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
+            <div key={s.label} className="rounded-2xl p-5" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
               <p className="text-xs mb-1" style={{ color: "#6B7280" }}>{s.label}</p>
               <p className="text-2xl font-bold">{s.value}</p>
               <p className="text-xs mt-1" style={{ color: s.color }}>{s.sub}</p>
@@ -335,8 +335,8 @@ export default function Metricas() {
           ))}
         </div>
 
-        <div className="rounded-2xl overflow-hidden mb-4" style={{ border: "1px solid #2A2A38" }}>
-          <div className="px-4 py-3 flex items-center justify-between" style={{ background: "#1A1A22", borderBottom: "1px solid #2A2A38" }}>
+        <div className="rounded-2xl overflow-hidden mb-4" style={{ border: "1px solid #22223A" }}>
+          <div className="px-4 py-3 flex items-center justify-between" style={{ background: "#0F0F1E", borderBottom: "1px solid #22223A" }}>
             <h3 className="font-semibold text-sm">Conteúdos</h3>
             <div className="flex gap-1">
               {(["posts", "reels"] as const).map((t) => (
@@ -359,7 +359,7 @@ export default function Metricas() {
           </div>
         </div>
 
-        <div className="rounded-2xl p-5" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
+        <div className="rounded-2xl p-5" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
           <div className="flex justify-between items-start mb-3">
             <h3 className="font-semibold">Perfil Aquecido</h3>
           </div>
@@ -367,7 +367,7 @@ export default function Metricas() {
             <span className="text-3xl font-bold">{warmthScore}%</span>
             <span className="px-3 py-1 rounded-full text-sm font-medium" style={{ background: "rgba(212,255,63,0.15)", color: "#D4FF3F" }}>Perfil Aquecido</span>
           </div>
-          <div className="w-full rounded-full h-4 overflow-hidden" style={{ background: "#2A2A38" }}>
+          <div className="w-full rounded-full h-4 overflow-hidden" style={{ background: "#22223A" }}>
             <div className="h-4 rounded-full" style={{ width: `${warmthScore}%`, background: "linear-gradient(90deg, #4B5563 0%, #D4FF3F 100%)" }}/>
           </div>
         </div>

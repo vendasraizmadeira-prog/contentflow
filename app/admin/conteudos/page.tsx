@@ -97,7 +97,7 @@ export default function AdminConteudos() {
             border: filter === f ? "1px solid rgba(123,77,255,0.3)" : "1px solid transparent",
           }}>{f}</button>
         ))}
-        <select value={clientFilter} onChange={e => setClientFilter(e.target.value)} className="ml-auto px-3 py-2 rounded-xl text-sm outline-none" style={{ background: "#1A1A22", border: "1px solid #2A2A38", color: "#fff" }}>
+        <select value={clientFilter} onChange={e => setClientFilter(e.target.value)} className="ml-auto px-3 py-2 rounded-xl text-sm outline-none" style={{ background: "#0F0F1E", border: "1px solid #22223A", color: "#fff" }}>
           <option value="all">Todos os clientes</option>
           {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
         </select>
@@ -105,7 +105,7 @@ export default function AdminConteudos() {
 
       {loading ? (
         <div className="grid grid-cols-3 gap-4">
-          {[1,2,3,4,5,6].map(i => <div key={i} className="rounded-2xl animate-pulse" style={{ background: "#1A1A22", height: 240 }} />)}
+          {[1,2,3,4,5,6].map(i => <div key={i} className="rounded-2xl animate-pulse" style={{ background: "#0F0F1E", height: 240 }} />)}
         </div>
       ) : filtered.length === 0 ? (
         <div className="text-center py-16" style={{ color: "#6B7280" }}>
@@ -117,13 +117,13 @@ export default function AdminConteudos() {
             const st = statusMap[item.status] ?? statusMap.em_revisao;
             const tc = typeColors[item.type] ?? "#7B4DFF";
             return (
-              <div key={item.id} className="rounded-2xl overflow-hidden" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
+              <div key={item.id} className="rounded-2xl overflow-hidden" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
                 <div className="relative" style={{ height: 160 }}>
                   {item.images[0] ? (
                     <img src={item.images[0]} alt="" className="w-full h-full object-cover"/>
                   ) : (
                     <div className="w-full h-full flex items-center justify-center" style={{ background: "#0B0B0F" }}>
-                      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#2A2A38" strokeWidth="2" strokeLinecap="round">
+                      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#22223A" strokeWidth="2" strokeLinecap="round">
                         {item.type === "reel"
                           ? <path d="M15 10l4.553-2.069A1 1 0 0121 8.87v6.26a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/>
                           : <path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>

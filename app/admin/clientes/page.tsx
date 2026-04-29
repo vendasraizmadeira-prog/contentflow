@@ -105,7 +105,7 @@ export default function Clientes() {
       {loading ? (
         <div className="flex flex-col gap-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="rounded-2xl p-4 animate-pulse" style={{ background: "#1A1A22", border: "1px solid #2A2A38", height: 80 }} />
+            <div key={i} className="rounded-2xl p-4 animate-pulse" style={{ background: "#0F0F1E", border: "1px solid #22223A", height: 80 }} />
           ))}
         </div>
       ) : clients.length === 0 ? (
@@ -123,8 +123,8 @@ export default function Clientes() {
       {/* New client modal */}
       {showNew && (
         <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center" style={{ background: "rgba(0,0,0,0.85)" }}>
-          <div className="w-full md:max-w-md rounded-t-3xl md:rounded-2xl p-6 pb-28 md:pb-6 max-h-[92vh] overflow-y-auto" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
-            <div className="w-10 h-1 rounded-full mx-auto mb-5 md:hidden" style={{ background: "#2A2A38" }} />
+          <div className="w-full md:max-w-md rounded-t-3xl md:rounded-2xl p-6 pb-28 md:pb-6 max-h-[92vh] overflow-y-auto" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
+            <div className="w-10 h-1 rounded-full mx-auto mb-5 md:hidden" style={{ background: "#22223A" }} />
             <h3 className="font-bold text-lg mb-0.5">Nova Conta</h3>
             <p className="text-xs mb-5" style={{ color: "#6B7280" }}>
               O cliente responderá o briefing ao entrar pela primeira vez.
@@ -144,7 +144,7 @@ export default function Clientes() {
                     placeholder={f.placeholder}
                     type={f.type}
                     className="w-full px-4 py-3 rounded-xl text-sm outline-none"
-                    style={{ background: "#0B0B0F", border: "1px solid #2A2A38", color: "#fff" }}
+                    style={{ background: "#0B0B0F", border: "1px solid #22223A", color: "#fff" }}
                   />
                 </div>
               ))}
@@ -158,7 +158,7 @@ export default function Clientes() {
                     placeholder="Mínimo 6 caracteres"
                     type={showPass ? "text" : "password"}
                     className="w-full px-4 py-3 rounded-xl text-sm outline-none pr-12"
-                    style={{ background: "#0B0B0F", border: "1px solid #2A2A38", color: "#fff" }}
+                    style={{ background: "#0B0B0F", border: "1px solid #22223A", color: "#fff" }}
                   />
                   <button onClick={() => setShowPass(!showPass)} type="button" className="absolute right-3 top-1/2 -translate-y-1/2">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2" strokeLinecap="round">
@@ -179,7 +179,7 @@ export default function Clientes() {
                   placeholder="Repita a senha"
                   type="password"
                   className="w-full px-4 py-3 rounded-xl text-sm outline-none"
-                  style={{ background: "#0B0B0F", border: `1px solid ${form.confirmPassword && form.password !== form.confirmPassword ? "#FF6B6B" : "#2A2A38"}`, color: "#fff" }}
+                  style={{ background: "#0B0B0F", border: `1px solid ${form.confirmPassword && form.password !== form.confirmPassword ? "#FF6B6B" : "#22223A"}`, color: "#fff" }}
                 />
               </div>
             </div>
@@ -197,7 +197,7 @@ export default function Clientes() {
               <button
                 onClick={() => { setShowNew(false); setFormError(""); }}
                 className="flex-1 py-3 rounded-xl text-sm"
-                style={{ border: "1px solid #2A2A38", color: "#9CA3AF" }}
+                style={{ border: "1px solid #22223A", color: "#9CA3AF" }}
               >
                 Cancelar
               </button>
@@ -222,7 +222,7 @@ function ClientCard({ client, onSelect }: { client: Client; onSelect: () => void
     <Link href={`/admin/clientes/${client.id}`} onClick={onSelect}>
       <div
         className="rounded-2xl p-4 transition-all active:scale-[0.99]"
-        style={{ background: "#1A1A22", border: `1px solid ${client.unreadCount > 0 ? "#7B4DFF44" : "#2A2A38"}` }}
+        style={{ background: "#0F0F1E", border: `1px solid ${client.unreadCount > 0 ? "#7B4DFF44" : "#22223A"}` }}
       >
         <div className="flex items-center gap-4">
           <div className="relative flex-shrink-0">

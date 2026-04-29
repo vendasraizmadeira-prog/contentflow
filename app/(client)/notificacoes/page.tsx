@@ -75,8 +75,8 @@ export default function Notificacoes() {
         onClick={() => markOne(n.id)}
         className="rounded-2xl p-4 flex items-start gap-4 cursor-pointer transition-all"
         style={{
-          background: n.read ? "#1A1A22" : "rgba(212,255,63,0.06)",
-          border: `1px solid ${n.read ? "#2A2A38" : "rgba(212,255,63,0.2)"}`,
+          background: n.read ? "#0F0F1E" : "rgba(212,255,63,0.06)",
+          border: `1px solid ${n.read ? "#22223A" : "rgba(212,255,63,0.2)"}`,
           opacity: dimmed && n.read ? 0.6 : 1,
         }}
       >
@@ -112,14 +112,14 @@ export default function Notificacoes() {
       {loading && (
         <div className="flex flex-col gap-2">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="rounded-2xl h-16 animate-pulse" style={{ background: "#1A1A22" }} />
+            <div key={i} className="rounded-2xl h-16 animate-pulse" style={{ background: "#0F0F1E" }} />
           ))}
         </div>
       )}
 
       {!loading && notifs.length === 0 && (
         <div className="flex flex-col items-center justify-center py-16 gap-3">
-          <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: "#1A1A22" }}>
+          <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: "#0F0F1E" }}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4B5563" strokeWidth="2" strokeLinecap="round">
               <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
             </svg>

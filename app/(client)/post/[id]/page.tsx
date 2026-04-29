@@ -275,7 +275,7 @@ export default function PostPage() {
       {images.length > 0 ? (
         <img src={images[slide]} alt="" className="w-full h-full object-cover" />
       ) : (
-        <div className="w-full h-full flex items-center justify-center" style={{ background: "#1A1A22" }}>
+        <div className="w-full h-full flex items-center justify-center" style={{ background: "#0F0F1E" }}>
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#4B5563" strokeWidth="1.5" strokeLinecap="round">
             <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>
           </svg>
@@ -315,7 +315,7 @@ export default function PostPage() {
           const canCancel = isReq && isPending && r.author_id === userId;
           const iconColor = r.type === "approved" ? "#22C55E" : r.type === "caption_edit" ? "#7B4DFF" : isCancelled ? "#4B5563" : "#FBBF24";
           return (
-            <div key={r.id} className="rounded-xl p-3 flex items-start gap-3" style={{ background: "#0B0B0F", border: "1px solid #2A2A38", opacity: isCancelled ? 0.5 : 1 }}>
+            <div key={r.id} className="rounded-xl p-3 flex items-start gap-3" style={{ background: "#0B0B0F", border: "1px solid #22223A", opacity: isCancelled ? 0.5 : 1 }}>
               <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: `${iconColor}20` }}>
                 {r.type === "approved" ? (
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={iconColor} strokeWidth="2.5" strokeLinecap="round"><path d="M20 6L9 17l-5-5"/></svg>
@@ -345,7 +345,7 @@ export default function PostPage() {
                 <p className="text-xs mt-0.5" style={{ color: "#6B7280" }}>{r.author} • {timeAgo(r.timestamp)}</p>
               </div>
               {canCancel && (
-                <button onClick={() => handleCancelRequest(r.id)} className="text-xs px-2.5 py-1 rounded-lg flex-shrink-0" style={{ border: "1px solid #2A2A38", color: "#9CA3AF" }}>
+                <button onClick={() => handleCancelRequest(r.id)} className="text-xs px-2.5 py-1 rounded-lg flex-shrink-0" style={{ border: "1px solid #22223A", color: "#9CA3AF" }}>
                   Cancelar
                 </button>
               )}
@@ -372,7 +372,7 @@ export default function PostPage() {
             {saving ? "Salvando..." : "Aprovar"}
           </button>
         )}
-        <button onClick={() => setShowModal(true)} disabled={saving} className="w-full py-4 rounded-2xl font-bold text-base active:scale-[0.97] transition-all disabled:opacity-60" style={{ border: "1px solid #2A2A38", color: "#fff" }}>
+        <button onClick={() => setShowModal(true)} disabled={saving} className="w-full py-4 rounded-2xl font-bold text-base active:scale-[0.97] transition-all disabled:opacity-60" style={{ border: "1px solid #22223A", color: "#fff" }}>
           Solicitar alteração
         </button>
         {pendingRequests.length > 0 && (
@@ -403,12 +403,12 @@ export default function PostPage() {
       {/* ── MOBILE ── */}
       <div className="md:hidden">
         {/* Instagram preview section */}
-        <div style={{ background: "#1A1A22" }}>
+        <div style={{ background: "#0F0F1E" }}>
           <div className="flex items-center gap-2.5 px-4 py-3">
             {avatar ? (
               <img src={avatar} alt="" className="w-8 h-8 rounded-full object-cover" />
             ) : (
-              <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold" style={{ background: "#2A2A38", color: "#D4FF3F" }}>
+              <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold" style={{ background: "#22223A", color: "#D4FF3F" }}>
                 {handle.charAt(0).toUpperCase()}
               </div>
             )}
@@ -448,7 +448,7 @@ export default function PostPage() {
 
         {tab === "descricao" && (
           <div className="p-4">
-            <div className="rounded-2xl p-4 mb-4" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
+            <div className="rounded-2xl p-4 mb-4" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
               <div className="flex items-center justify-between mb-2">
                 <p className="text-xs font-semibold" style={{ color: "#6B7280" }}>DESCRIÇÃO / LEGENDA</p>
                 {!editingCaption && (
@@ -462,10 +462,10 @@ export default function PostPage() {
                     onChange={(e) => setCaptionDraft(e.target.value)}
                     rows={5}
                     className="w-full px-3 py-2.5 rounded-xl text-sm resize-none outline-none mb-3"
-                    style={{ background: "#0B0B0F", border: "1px solid #2A2A38", color: "#fff" }}
+                    style={{ background: "#0B0B0F", border: "1px solid #22223A", color: "#fff" }}
                   />
                   <div className="flex gap-2">
-                    <button onClick={() => setEditingCaption(false)} className="flex-1 py-2 rounded-xl text-sm" style={{ border: "1px solid #2A2A38", color: "#9CA3AF" }}>Cancelar</button>
+                    <button onClick={() => setEditingCaption(false)} className="flex-1 py-2 rounded-xl text-sm" style={{ border: "1px solid #22223A", color: "#9CA3AF" }}>Cancelar</button>
                     <button onClick={handleSaveCaption} disabled={saving} className="flex-1 py-2 rounded-xl text-sm font-bold disabled:opacity-60" style={{ background: "#D4FF3F", color: "#0B0B0F" }}>Salvar</button>
                   </div>
                 </>
@@ -490,12 +490,12 @@ export default function PostPage() {
         <div className="grid grid-cols-2 gap-8">
           <div>
             <p className="text-xs font-medium mb-3" style={{ color: "#6B7280" }}>PREVIEW INSTAGRAM</p>
-            <div className="rounded-2xl overflow-hidden" style={{ background: "#1A1A22", border: "1px solid #2A2A38", maxWidth: 380 }}>
+            <div className="rounded-2xl overflow-hidden" style={{ background: "#0F0F1E", border: "1px solid #22223A", maxWidth: 380 }}>
               <div className="flex items-center gap-2 p-3">
                 {avatar ? (
                   <img src={avatar} alt="" className="w-8 h-8 rounded-full object-cover"/>
                 ) : (
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold" style={{ background: "#2A2A38", color: "#D4FF3F" }}>{handle.charAt(0).toUpperCase()}</div>
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold" style={{ background: "#22223A", color: "#D4FF3F" }}>{handle.charAt(0).toUpperCase()}</div>
                 )}
                 <div>
                   <p className="text-xs font-semibold">{handle}</p>
@@ -512,7 +512,7 @@ export default function PostPage() {
           </div>
 
           <div className="flex flex-col gap-4">
-            <div className="rounded-2xl p-5" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
+            <div className="rounded-2xl p-5" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-sm font-semibold">Descrição / Legenda</h3>
                 {!editingCaption && (
@@ -526,10 +526,10 @@ export default function PostPage() {
                     onChange={(e) => setCaptionDraft(e.target.value)}
                     rows={5}
                     className="w-full px-3 py-2.5 rounded-xl text-sm resize-none outline-none mb-3"
-                    style={{ background: "#0B0B0F", border: "1px solid #2A2A38", color: "#fff" }}
+                    style={{ background: "#0B0B0F", border: "1px solid #22223A", color: "#fff" }}
                   />
                   <div className="flex gap-2">
-                    <button onClick={() => setEditingCaption(false)} className="flex-1 py-2 rounded-xl text-sm" style={{ border: "1px solid #2A2A38", color: "#9CA3AF" }}>Cancelar</button>
+                    <button onClick={() => setEditingCaption(false)} className="flex-1 py-2 rounded-xl text-sm" style={{ border: "1px solid #22223A", color: "#9CA3AF" }}>Cancelar</button>
                     <button onClick={handleSaveCaption} disabled={saving} className="flex-1 py-2 rounded-xl text-sm font-bold disabled:opacity-60" style={{ background: "#D4FF3F", color: "#0B0B0F" }}>Salvar</button>
                   </div>
                 </>
@@ -543,7 +543,7 @@ export default function PostPage() {
             <ActionButtons />
 
             {content.revisions.length > 0 && (
-              <div className="rounded-2xl p-5" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
+              <div className="rounded-2xl p-5" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
                 <h3 className="text-sm font-semibold mb-3">Histórico</h3>
                 <RevisionHistory />
               </div>
@@ -555,8 +555,8 @@ export default function PostPage() {
       {/* Change request modal */}
       {showModal && (
         <div className="fixed inset-0 flex items-end md:items-center justify-center z-50" style={{ background: "rgba(0,0,0,0.85)" }}>
-          <div className="w-full md:max-w-md rounded-t-3xl md:rounded-2xl p-6 pb-10 md:pb-6" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
-            <div className="w-10 h-1 rounded-full mx-auto mb-4 md:hidden" style={{ background: "#2A2A38" }}/>
+          <div className="w-full md:max-w-md rounded-t-3xl md:rounded-2xl p-6 pb-10 md:pb-6" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
+            <div className="w-10 h-1 rounded-full mx-auto mb-4 md:hidden" style={{ background: "#22223A" }}/>
             <h3 className="font-bold mb-1">Solicitar alteração</h3>
             <p className="text-sm mb-4" style={{ color: "#6B7280" }}>Descreva o que precisa ser alterado</p>
 
@@ -564,11 +564,11 @@ export default function PostPage() {
               <div className="mb-4">
                 <label className="text-xs font-semibold block mb-1.5" style={{ color: "#9CA3AF" }}>SLIDE (OPCIONAL)</label>
                 <div className="flex gap-2 flex-wrap">
-                  <button onClick={() => setSelectedSlide(null)} className="px-3 py-1.5 rounded-xl text-xs font-medium" style={{ background: selectedSlide === null ? "rgba(212,255,63,0.15)" : "#0B0B0F", color: selectedSlide === null ? "#D4FF3F" : "#6B7280", border: `1px solid ${selectedSlide === null ? "rgba(212,255,63,0.3)" : "#2A2A38"}` }}>
+                  <button onClick={() => setSelectedSlide(null)} className="px-3 py-1.5 rounded-xl text-xs font-medium" style={{ background: selectedSlide === null ? "rgba(212,255,63,0.15)" : "#0B0B0F", color: selectedSlide === null ? "#D4FF3F" : "#6B7280", border: `1px solid ${selectedSlide === null ? "rgba(212,255,63,0.3)" : "#22223A"}` }}>
                     Geral
                   </button>
                   {images.map((_, i) => (
-                    <button key={i} onClick={() => setSelectedSlide(i)} className="px-3 py-1.5 rounded-xl text-xs font-medium" style={{ background: selectedSlide === i ? "rgba(212,255,63,0.15)" : "#0B0B0F", color: selectedSlide === i ? "#D4FF3F" : "#6B7280", border: `1px solid ${selectedSlide === i ? "rgba(212,255,63,0.3)" : "#2A2A38"}` }}>
+                    <button key={i} onClick={() => setSelectedSlide(i)} className="px-3 py-1.5 rounded-xl text-xs font-medium" style={{ background: selectedSlide === i ? "rgba(212,255,63,0.15)" : "#0B0B0F", color: selectedSlide === i ? "#D4FF3F" : "#6B7280", border: `1px solid ${selectedSlide === i ? "rgba(212,255,63,0.3)" : "#22223A"}` }}>
                       Slide {i + 1}
                     </button>
                   ))}
@@ -582,11 +582,11 @@ export default function PostPage() {
               placeholder="Ex: Trocar a cor do fundo, ajustar o texto..."
               rows={4}
               className="w-full px-3 py-2.5 rounded-2xl text-sm resize-none outline-none mb-4"
-              style={{ background: "#0B0B0F", border: "1px solid #2A2A38", color: "#fff" }}
+              style={{ background: "#0B0B0F", border: "1px solid #22223A", color: "#fff" }}
               autoFocus
             />
             <div className="flex gap-3">
-              <button onClick={() => { setShowModal(false); setChangeNote(""); setSelectedSlide(null); }} className="flex-1 py-3 rounded-2xl text-sm" style={{ border: "1px solid #2A2A38", color: "#9CA3AF" }}>Cancelar</button>
+              <button onClick={() => { setShowModal(false); setChangeNote(""); setSelectedSlide(null); }} className="flex-1 py-3 rounded-2xl text-sm" style={{ border: "1px solid #22223A", color: "#9CA3AF" }}>Cancelar</button>
               <button onClick={handleChangeRequest} disabled={!changeNote.trim() || saving} className="flex-1 py-3 rounded-2xl text-sm font-bold disabled:opacity-40" style={{ background: "#D4FF3F", color: "#0B0B0F" }}>
                 {saving ? "Enviando..." : "Enviar"}
               </button>

@@ -60,10 +60,10 @@ export default function ClienteHub() {
   if (loading) {
     return (
       <div className="p-4 md:p-6 max-w-2xl">
-        <div className="rounded-2xl p-4 mb-5 animate-pulse" style={{ background: "#1A1A22", height: 96 }} />
+        <div className="rounded-2xl p-4 mb-5 animate-pulse" style={{ background: "#0F0F1E", height: 96 }} />
         <div className="grid grid-cols-2 gap-3">
           {[1,2,3,4,5,6].map(i => (
-            <div key={i} className="rounded-2xl animate-pulse" style={{ background: "#1A1A22", height: 100 }} />
+            <div key={i} className="rounded-2xl animate-pulse" style={{ background: "#0F0F1E", height: 100 }} />
           ))}
         </div>
       </div>
@@ -134,7 +134,7 @@ export default function ClienteHub() {
         </div>
       </Link>
 
-      <div className="rounded-2xl p-4 mb-5 flex items-center gap-4" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
+      <div className="rounded-2xl p-4 mb-5 flex items-center gap-4" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
         <div className="relative flex-shrink-0">
           {profile.avatar ? (
             <img src={profile.avatar} alt="" className="w-16 h-16 rounded-full object-cover" style={{ border: "2px solid #7B4DFF" }} />
@@ -143,7 +143,7 @@ export default function ClienteHub() {
               {profile.name?.charAt(0) ?? "?"}
             </div>
           )}
-          <span className="absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 flex items-center justify-center" style={{ background: "#22C55E", borderColor: "#1A1A22" }} />
+          <span className="absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 flex items-center justify-center" style={{ background: "#22C55E", borderColor: "#0F0F1E" }} />
         </div>
         <div className="flex-1">
           <h1 className="font-bold text-lg leading-tight">{profile.name}</h1>
@@ -163,7 +163,7 @@ export default function ClienteHub() {
       <div className="grid grid-cols-2 gap-3">
         {sections.map((s) => (
           <Link key={s.href} href={s.href}>
-            <div className="rounded-2xl p-4 h-full transition-all active:scale-[0.97]" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
+            <div className="rounded-2xl p-4 h-full transition-all active:scale-[0.97]" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
               <div className="flex items-start justify-between mb-3">
                 <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: `${s.color}20` }}>
                   <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={s.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

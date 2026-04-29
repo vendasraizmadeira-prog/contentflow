@@ -67,13 +67,13 @@ export default function NovoConteudo() {
 
       <div className="grid grid-cols-2 gap-6">
         <div className="flex flex-col gap-4">
-          <div className="rounded-2xl p-5" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
+          <div className="rounded-2xl p-5" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
             <p className="text-xs font-medium mb-3" style={{ color: "#9CA3AF" }}>TIPO DE CONTEÚDO</p>
             <div className="grid grid-cols-4 gap-2">
               {types.map(t => (
                 <button key={t.key} onClick={() => setType(t.key)} className="py-3 rounded-xl flex flex-col items-center gap-1.5 transition-all" style={{
                   background: type === t.key ? "rgba(123,77,255,0.15)" : "#0B0B0F",
-                  border: `1px solid ${type === t.key ? "#7B4DFF" : "#2A2A38"}`,
+                  border: `1px solid ${type === t.key ? "#7B4DFF" : "#22223A"}`,
                   color: type === t.key ? "#7B4DFF" : "#6B7280",
                 }}>
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={t.icon}/></svg>
@@ -83,11 +83,11 @@ export default function NovoConteudo() {
             </div>
           </div>
 
-          <div className="rounded-2xl p-5" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
+          <div className="rounded-2xl p-5" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
             <p className="text-xs font-medium mb-3" style={{ color: "#9CA3AF" }}>MÍDIA</p>
             <input ref={fileRef} type="file" multiple accept="image/*,video/*" onChange={handleFiles} className="hidden"/>
             {previews.length === 0 ? (
-              <div onClick={() => fileRef.current?.click()} className="rounded-xl flex flex-col items-center justify-center cursor-pointer p-8 transition-all hover:opacity-80" style={{ background: "#0B0B0F", border: "2px dashed #2A2A38" }}>
+              <div onClick={() => fileRef.current?.click()} className="rounded-xl flex flex-col items-center justify-center cursor-pointer p-8 transition-all hover:opacity-80" style={{ background: "#0B0B0F", border: "2px dashed #22223A" }}>
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#4B5563" strokeWidth="1.5" strokeLinecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
                 <p className="text-sm mt-2" style={{ color: "#6B7280" }}>Clique para fazer upload</p>
                 <p className="text-xs mt-1" style={{ color: "#4B5563" }}>PNG, JPG, MP4 até 500MB</p>
@@ -102,7 +102,7 @@ export default function NovoConteudo() {
                     </button>
                   </div>
                 ))}
-                <div onClick={() => fileRef.current?.click()} className="rounded-xl flex items-center justify-center cursor-pointer aspect-square" style={{ background: "#0B0B0F", border: "2px dashed #2A2A38" }}>
+                <div onClick={() => fileRef.current?.click()} className="rounded-xl flex items-center justify-center cursor-pointer aspect-square" style={{ background: "#0B0B0F", border: "2px dashed #22223A" }}>
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4B5563" strokeWidth="2" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
                 </div>
               </div>
@@ -111,31 +111,31 @@ export default function NovoConteudo() {
         </div>
 
         <div className="flex flex-col gap-4">
-          <div className="rounded-2xl p-5" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
+          <div className="rounded-2xl p-5" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
             <div className="flex flex-col gap-4">
               <div>
                 <label className="text-xs font-medium block mb-1.5" style={{ color: "#9CA3AF" }}>CLIENTE</label>
-                <select value={clientId} onChange={e => setClientId(e.target.value)} className="w-full px-4 py-3 rounded-xl text-sm outline-none" style={{ background: "#0B0B0F", border: "1px solid #2A2A38", color: "#fff" }}>
+                <select value={clientId} onChange={e => setClientId(e.target.value)} className="w-full px-4 py-3 rounded-xl text-sm outline-none" style={{ background: "#0B0B0F", border: "1px solid #22223A", color: "#fff" }}>
                   {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
               </div>
               <div>
                 <label className="text-xs font-medium block mb-1.5" style={{ color: "#9CA3AF" }}>TÍTULO</label>
-                <input value={title} onChange={e => setTitle(e.target.value)} placeholder="Nome do conteúdo" className="w-full px-4 py-3 rounded-xl text-sm outline-none" style={{ background: "#0B0B0F", border: "1px solid #2A2A38", color: "#fff" }}/>
+                <input value={title} onChange={e => setTitle(e.target.value)} placeholder="Nome do conteúdo" className="w-full px-4 py-3 rounded-xl text-sm outline-none" style={{ background: "#0B0B0F", border: "1px solid #22223A", color: "#fff" }}/>
               </div>
               <div>
                 <label className="text-xs font-medium block mb-1.5" style={{ color: "#9CA3AF" }}>LEGENDA / ROTEIRO</label>
-                <textarea value={caption} onChange={e => setCaption(e.target.value)} placeholder="Escreva a legenda ou roteiro..." rows={5} className="w-full px-4 py-3 rounded-xl text-sm resize-none outline-none" style={{ background: "#0B0B0F", border: "1px solid #2A2A38", color: "#fff" }}/>
+                <textarea value={caption} onChange={e => setCaption(e.target.value)} placeholder="Escreva a legenda ou roteiro..." rows={5} className="w-full px-4 py-3 rounded-xl text-sm resize-none outline-none" style={{ background: "#0B0B0F", border: "1px solid #22223A", color: "#fff" }}/>
               </div>
               <div>
                 <label className="text-xs font-medium block mb-1.5" style={{ color: "#9CA3AF" }}>DATA DE PUBLICAÇÃO</label>
-                <input type="date" value={date} onChange={e => setDate(e.target.value)} className="w-full px-4 py-3 rounded-xl text-sm outline-none" style={{ background: "#0B0B0F", border: "1px solid #2A2A38", color: "#fff" }}/>
+                <input type="date" value={date} onChange={e => setDate(e.target.value)} className="w-full px-4 py-3 rounded-xl text-sm outline-none" style={{ background: "#0B0B0F", border: "1px solid #22223A", color: "#fff" }}/>
               </div>
             </div>
           </div>
 
           <div className="flex gap-3">
-            <button onClick={() => submit(true)} disabled={saving || !clientId || !title.trim()} className="flex-1 py-3 rounded-xl text-sm font-medium disabled:opacity-40" style={{ border: "1px solid #2A2A38", color: "#fff" }}>
+            <button onClick={() => submit(true)} disabled={saving || !clientId || !title.trim()} className="flex-1 py-3 rounded-xl text-sm font-medium disabled:opacity-40" style={{ border: "1px solid #22223A", color: "#fff" }}>
               {saving ? "Salvando..." : "Salvar rascunho"}
             </button>
             <button onClick={() => submit(false)} disabled={saving || !clientId || !title.trim()} className="flex-1 py-3 rounded-xl text-sm font-bold disabled:opacity-40" style={{ background: "#7B4DFF", color: "#fff" }}>

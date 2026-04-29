@@ -118,8 +118,8 @@ export default function Briefing() {
         )}
       </div>
 
-      <div className="rounded-2xl p-6" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
-        <div className="flex items-center gap-3 mb-6 pb-5" style={{ borderBottom: "1px solid #2A2A38" }}>
+      <div className="rounded-2xl p-6" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
+        <div className="flex items-center gap-3 mb-6 pb-5" style={{ borderBottom: "1px solid #22223A" }}>
           <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: "rgba(212,255,63,0.12)" }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D4FF3F" strokeWidth="2" strokeLinecap="round"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
           </div>
@@ -139,7 +139,7 @@ export default function Briefing() {
                 placeholder={q.placeholder}
                 rows={2}
                 className="w-full px-4 py-3 rounded-xl text-sm resize-none outline-none transition-all"
-                style={{ background: "#0B0B0F", border: "1px solid #2A2A38", color: "#fff" }}
+                style={{ background: "#0B0B0F", border: "1px solid #22223A", color: "#fff" }}
               />
             </div>
           ))}

@@ -130,14 +130,14 @@ export default function AdminCalendario() {
           value={filterClient}
           onChange={(e) => setFilterClient(e.target.value)}
           className="px-3 py-2 rounded-xl text-sm outline-none flex-shrink-0"
-          style={{ background: "#1A1A22", border: "1px solid #2A2A38", color: "#fff" }}
+          style={{ background: "#0F0F1E", border: "1px solid #22223A", color: "#fff" }}
         >
           <option value="all">Todos</option>
           {clients.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
         </select>
       </div>
 
-      <div className="rounded-2xl p-4 md:p-5" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
+      <div className="rounded-2xl p-4 md:p-5" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
         <div className="flex items-center justify-between mb-5">
           <button onClick={prevMonth} className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "#0B0B0F" }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
@@ -164,7 +164,7 @@ export default function AdminCalendario() {
                 key={day}
                 onClick={() => openSchedule(day)}
                 className="rounded-xl p-1.5 md:p-2 min-h-14 md:min-h-20 text-left transition-all active:scale-[0.96]"
-                style={{ background: "#0B0B0F", border: isToday ? "1.5px solid #7B4DFF" : "1px solid #2A2A38" }}
+                style={{ background: "#0B0B0F", border: isToday ? "1.5px solid #7B4DFF" : "1px solid #22223A" }}
               >
                 <span className="text-xs font-semibold" style={{ color: isToday ? "#7B4DFF" : "#9CA3AF" }}>{day}</span>
                 <div className="flex flex-col gap-0.5 mt-0.5">
@@ -186,7 +186,7 @@ export default function AdminCalendario() {
           })}
         </div>
 
-        <div className="flex flex-wrap items-center gap-3 mt-4 pt-4" style={{ borderTop: "1px solid #2A2A38" }}>
+        <div className="flex flex-wrap items-center gap-3 mt-4 pt-4" style={{ borderTop: "1px solid #22223A" }}>
           {Object.entries(typeColors).map(([type, color]) => (
             <div key={type} className="flex items-center gap-1.5">
               <div className="w-2.5 h-2.5 rounded-full" style={{ background: color }} />
@@ -199,38 +199,38 @@ export default function AdminCalendario() {
 
       {showModal && selectedDay && (
         <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center" style={{ background: "rgba(0,0,0,0.85)" }}>
-          <div className="w-full md:max-w-sm rounded-t-3xl md:rounded-2xl p-6 pb-28 md:pb-6" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
-            <div className="w-10 h-1 rounded-full mx-auto mb-4 md:hidden" style={{ background: "#2A2A38" }} />
+          <div className="w-full md:max-w-sm rounded-t-3xl md:rounded-2xl p-6 pb-28 md:pb-6" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
+            <div className="w-10 h-1 rounded-full mx-auto mb-4 md:hidden" style={{ background: "#22223A" }} />
             <h3 className="font-bold text-lg mb-1">Agendar evento</h3>
             <p className="text-xs mb-5" style={{ color: "#7B4DFF" }}>{formatDate(selectedDay)}</p>
 
             <div className="flex flex-col gap-4 mb-5">
               <div>
                 <label className="text-xs font-semibold block mb-1.5" style={{ color: "#9CA3AF" }}>TÍTULO</label>
-                <input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="Ex: Gravação produto novo" className="w-full px-4 py-3 rounded-xl text-sm outline-none" style={{ background: "#0B0B0F", border: "1px solid #2A2A38", color: "#fff" }} autoFocus />
+                <input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="Ex: Gravação produto novo" className="w-full px-4 py-3 rounded-xl text-sm outline-none" style={{ background: "#0B0B0F", border: "1px solid #22223A", color: "#fff" }} autoFocus />
               </div>
               <div>
                 <label className="text-xs font-semibold block mb-1.5" style={{ color: "#9CA3AF" }}>TIPO</label>
-                <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })} className="w-full px-4 py-3 rounded-xl text-sm outline-none" style={{ background: "#0B0B0F", border: "1px solid #2A2A38", color: "#fff" }}>
+                <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })} className="w-full px-4 py-3 rounded-xl text-sm outline-none" style={{ background: "#0B0B0F", border: "1px solid #22223A", color: "#fff" }}>
                   {Object.entries(typeLabels).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                 </select>
               </div>
               <div>
                 <label className="text-xs font-semibold block mb-1.5" style={{ color: "#9CA3AF" }}>HORÁRIO</label>
-                <select value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })} className="w-full px-4 py-3 rounded-xl text-sm outline-none" style={{ background: "#0B0B0F", border: "1px solid #2A2A38", color: "#fff" }}>
+                <select value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })} className="w-full px-4 py-3 rounded-xl text-sm outline-none" style={{ background: "#0B0B0F", border: "1px solid #22223A", color: "#fff" }}>
                   {HOURS.map((h) => <option key={h} value={h}>{h}</option>)}
                 </select>
               </div>
               <div>
                 <label className="text-xs font-semibold block mb-1.5" style={{ color: "#9CA3AF" }}>CLIENTE</label>
-                <select value={form.clientId} onChange={(e) => setForm({ ...form, clientId: e.target.value })} className="w-full px-4 py-3 rounded-xl text-sm outline-none" style={{ background: "#0B0B0F", border: "1px solid #2A2A38", color: "#fff" }}>
+                <select value={form.clientId} onChange={(e) => setForm({ ...form, clientId: e.target.value })} className="w-full px-4 py-3 rounded-xl text-sm outline-none" style={{ background: "#0B0B0F", border: "1px solid #22223A", color: "#fff" }}>
                   {clients.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
               </div>
             </div>
 
             <div className="flex gap-3">
-              <button onClick={() => setShowModal(false)} className="flex-1 py-3 rounded-xl text-sm" style={{ border: "1px solid #2A2A38", color: "#9CA3AF" }}>Cancelar</button>
+              <button onClick={() => setShowModal(false)} className="flex-1 py-3 rounded-xl text-sm" style={{ border: "1px solid #22223A", color: "#9CA3AF" }}>Cancelar</button>
               <button onClick={scheduleEvent} disabled={!form.title.trim() || saving} className="flex-1 py-3 rounded-xl text-sm font-bold transition-all disabled:opacity-40" style={{ background: "#FF6B6B", color: "#fff" }}>
                 {saving ? "Salvando..." : "Agendar"}
               </button>

@@ -19,7 +19,7 @@ export default function Home() {
 
       <div className="flex flex-col gap-4 w-80">
         <Link href="/login?portal=client">
-          <div className="rounded-2xl p-5 flex items-center gap-4 cursor-pointer transition-all hover:scale-[1.02]" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
+          <div className="rounded-2xl p-5 flex items-center gap-4 cursor-pointer transition-all hover:scale-[1.02]" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
             <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "rgba(212,255,63,0.15)" }}>
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="#D4FF3F" strokeWidth="2" strokeLinecap="round"/>
@@ -34,7 +34,7 @@ export default function Home() {
         </Link>
 
         <Link href="/login?portal=admin">
-          <div className="rounded-2xl p-5 flex items-center gap-4 cursor-pointer transition-all hover:scale-[1.02]" style={{ background: "#1A1A22", border: "1px solid #2A2A38" }}>
+          <div className="rounded-2xl p-5 flex items-center gap-4 cursor-pointer transition-all hover:scale-[1.02]" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
             <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "rgba(123,77,255,0.15)" }}>
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
                 <rect x="3" y="3" width="7" height="7" rx="1" stroke="#7B4DFF" strokeWidth="2"/>
