@@ -134,7 +134,7 @@ export default function ClienteHub() {
         </div>
       </Link>
 
-      <div className="rounded-2xl p-4 mb-5 flex items-center gap-4" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
+      <div className="rounded-2xl p-4 mb-4 flex items-center gap-4" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
         <div className="relative flex-shrink-0">
           {profile.avatar ? (
             <img src={profile.avatar} alt="" className="w-16 h-16 rounded-full object-cover" style={{ border: "2px solid #7B4DFF" }} />
@@ -157,6 +157,24 @@ export default function ClienteHub() {
             )}
           </div>
         </div>
+      </div>
+
+      {/* Ver como cliente */}
+      <div className="rounded-2xl p-4 mb-5 flex items-center gap-3" style={{ background: "rgba(123,77,255,0.08)", border: "1px solid rgba(123,77,255,0.25)" }}>
+        <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "rgba(123,77,255,0.2)" }}>
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#7B4DFF" strokeWidth="2" strokeLinecap="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+          </svg>
+        </div>
+        <div className="flex-1">
+          <p className="text-sm font-semibold" style={{ color: "#A78BFA" }}>Prévia do cliente</p>
+          <p className="text-xs" style={{ color: "#6B7280" }}>Veja exatamente como o perfil aparece no Instagram</p>
+        </div>
+        <Link href={`/admin/clientes/${id}/perfil`}>
+          <button className="px-3 py-1.5 rounded-xl text-xs font-semibold flex-shrink-0" style={{ background: "#7B4DFF", color: "#fff" }}>
+            Ver perfil
+          </button>
+        </Link>
       </div>
 
       <p className="text-xs font-semibold mb-3" style={{ color: "#6B7280" }}>GESTÃO DA CONTA</p>

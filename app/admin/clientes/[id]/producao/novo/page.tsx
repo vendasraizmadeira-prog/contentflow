@@ -4,6 +4,15 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Suspense } from "react";
 
+async function uploadImage(file: File, clientId: string): Promise<string> {
+  const supabase = createClient();
+  const ext = file.name.split(".").pop() ?? "jpg";
+  const path = `producao/${clientId}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+  const { error } = await supabase.storage.from("media").upload(path, file, { upsert: false, contentType: file.type });
+  if (error) throw new Error(error.message);
+  return supabase.storage.from("media").getPublicUrl(path).data.publicUrl;
+}
+
 function NovaProducaoForm() {
   const { id } = useParams() as { id: string };
   const router = useRouter();
@@ -18,10 +27,15 @@ function NovaProducaoForm() {
   const [caption, setCaption] = useState("");
   const [scheduledDate, setScheduledDate] = useState("");
   const [images, setImages] = useState<string[]>([]);
-  const [videoName, setVideoName] = useState("");
+  const [uploadingImages, setUploadingImages] = useState(false);
+  const [videoUrl, setVideoUrl] = useState("");
+  const [videoCover, setVideoCover] = useState("");
+  const [uploadingVideo, setUploadingVideo] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
   const imgRef = useRef<HTMLInputElement>(null);
   const vidRef = useRef<HTMLInputElement>(null);
+  const coverRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -37,40 +51,86 @@ function NovaProducaoForm() {
   }, [id, roteiroId]);
 
   const isVideo = tipo === "reel";
-  const isImage = !isVideo;
   const maxImages = postSubtype === "carousel" ? 10 : 1;
 
-  const handleImages = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImages = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    const previews = files.map((f) => URL.createObjectURL(f));
-    setImages((prev) => [...prev, ...previews].slice(0, maxImages));
+    if (files.length === 0) return;
+    const remaining = maxImages - images.length;
+    const toUpload = files.slice(0, remaining);
+    setUploadingImages(true);
+    setError("");
+    try {
+      const urls = await Promise.all(toUpload.map((f) => uploadImage(f, id)));
+      setImages((prev) => [...prev, ...urls].slice(0, maxImages));
+    } catch {
+      setError("Erro ao fazer upload. Verifique se o bucket 'media' existe no Supabase Storage.");
+    }
+    setUploadingImages(false);
+    e.target.value = "";
+  };
+
+  const handleVideoFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingVideo(true);
+    setError("");
+    try {
+      const url = await uploadImage(file, id);
+      setVideoUrl(url);
+    } catch {
+      setError("Erro ao fazer upload do vídeo. Verifique o bucket 'media' no Supabase Storage.");
+    }
+    setUploadingVideo(false);
+    e.target.value = "";
+  };
+
+  const handleCoverFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingVideo(true);
+    try {
+      const url = await uploadImage(file, id);
+      setVideoCover(url);
+    } catch {
+      setError("Erro ao fazer upload da capa.");
+    }
+    setUploadingVideo(false);
+    e.target.value = "";
   };
 
   const submit = async () => {
-    if (isImage && images.length === 0) return;
-    if (isVideo && !videoName) return;
-    if (!caption.trim()) return;
+    if (!isVideo && images.length === 0) { setError("Adicione pelo menos uma imagem."); return; }
+    if (isVideo && !videoUrl) { setError("Faça upload do vídeo."); return; }
+    if (!caption.trim()) { setError("A legenda é obrigatória."); return; }
     setSaving(true);
+    setError("");
     const supabase = createClient();
-    await supabase.from("producao_items").insert({
+
+    const { error: err } = await supabase.from("producao_items").insert({
       client_id: id,
       roteiro_id: roteiroId || null,
       roteiro_title: titulo,
       type: tipo,
       post_subtype: isVideo ? "single" : postSubtype,
       status: "em_revisao",
-      images: isImage ? images : [],
+      images: isVideo ? (videoCover ? [videoCover] : []) : images,
+      video_url: isVideo ? videoUrl : null,
       caption: caption.trim(),
       scheduled_date: scheduledDate || null,
     });
+
+    if (err) { setError(err.message); setSaving(false); return; }
+
     if (roteiroId) {
       await supabase.from("roteiros").update({ producao_id: "pending" }).eq("id", roteiroId);
     }
+
     setSaving(false);
     router.push(`/admin/clientes/${id}/producao`);
   };
 
-  const typeLabel = { post: "Post", reel: "Reels", carousel: "Carrossel", story: "Stories" }[tipo];
+  const typeLabel = { post: "Post", reel: "Reels", carousel: "Carrossel", story: "Stories" }[tipo] ?? tipo;
 
   return (
     <div className="p-4 md:p-6 max-w-2xl">
@@ -82,19 +142,19 @@ function NovaProducaoForm() {
       <h1 className="text-xl font-bold mb-1">{titulo}</h1>
       <p className="text-xs mb-5" style={{ color: "#6B7280" }}>
         <span className="px-2 py-0.5 rounded-full mr-2" style={{ background: "#7B4DFF22", color: "#7B4DFF" }}>{typeLabel}</span>
-        Subindo conteúdo para aprovação
+        Enviando para aprovação do cliente
       </p>
 
       {roteiroContent && (
         <div className="rounded-2xl p-4 mb-4" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
-          <p className="text-xs font-semibold mb-2" style={{ color: "#10B981" }}>ROTEIRO APROVADO (referência)</p>
-          <p className="text-sm leading-relaxed whitespace-pre-wrap line-clamp-4" style={{ color: "#9CA3AF" }}>
-            {roteiroContent}
-          </p>
+          <p className="text-xs font-semibold mb-2" style={{ color: "#10B981" }}>ROTEIRO (referência)</p>
+          <p className="text-sm leading-relaxed whitespace-pre-wrap line-clamp-4" style={{ color: "#9CA3AF" }}>{roteiroContent}</p>
         </div>
       )}
 
       <div className="rounded-2xl p-5 mb-4" style={{ background: "#0F0F1E", border: "1px solid #22223A" }}>
+
+        {/* Post format */}
         {(tipo === "post" || tipo === "carousel") && (
           <>
             <p className="text-xs font-semibold mb-3" style={{ color: "#9CA3AF" }}>FORMATO DO POST</p>
@@ -110,11 +170,10 @@ function NovaProducaoForm() {
                     color: postSubtype === sub ? "#7B4DFF" : "#6B7280",
                   }}
                 >
-                  {sub === "single" ? (
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
-                  ) : (
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg>
-                  )}
+                  {sub === "single"
+                    ? <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+                    : <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg>
+                  }
                   <span className="text-xs font-medium">{sub === "single" ? "Post único" : "Carrossel"}</span>
                 </button>
               ))}
@@ -122,7 +181,8 @@ function NovaProducaoForm() {
           </>
         )}
 
-        {isImage && (
+        {/* Image upload */}
+        {!isVideo && (
           <>
             <p className="text-xs font-semibold mb-3" style={{ color: "#9CA3AF" }}>
               {postSubtype === "carousel" ? `SLIDES (${images.length}/${maxImages})` : "IMAGEM DO POST"}
@@ -139,39 +199,120 @@ function NovaProducaoForm() {
                 </div>
               ))}
               {images.length < maxImages && (
-                <button onClick={() => imgRef.current?.click()} className="w-20 h-20 rounded-xl flex flex-col items-center justify-center gap-1 flex-shrink-0" style={{ background: "#0B0B0F", border: "1px dashed #22223A" }}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
-                  <span className="text-xs" style={{ color: "#6B7280" }}>Adicionar</span>
+                <button
+                  onClick={() => imgRef.current?.click()}
+                  disabled={uploadingImages}
+                  className="w-20 h-20 rounded-xl flex flex-col items-center justify-center gap-1 flex-shrink-0"
+                  style={{ background: "#0B0B0F", border: "1px dashed #22223A" }}
+                >
+                  {uploadingImages ? (
+                    <div className="w-5 h-5 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: "#7B4DFF", borderTopColor: "transparent" }} />
+                  ) : (
+                    <>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
+                      <span className="text-xs" style={{ color: "#6B7280" }}>Upload</span>
+                    </>
+                  )}
                 </button>
               )}
+            </div>
+            <p className="text-xs mb-5" style={{ color: "#4B5563" }}>
+              As imagens são salvas automaticamente no servidor ao selecionar.
+            </p>
+          </>
+        )}
+
+        {/* Video upload */}
+        {isVideo && (
+          <>
+            <p className="text-xs font-semibold mb-3" style={{ color: "#9CA3AF" }}>VÍDEO DO REEL</p>
+            <input ref={vidRef} type="file" accept="video/*" onChange={handleVideoFile} className="hidden" />
+            <input ref={coverRef} type="file" accept="image/*" onChange={handleCoverFile} className="hidden" />
+
+            <div className="flex gap-3 mb-4">
+              {/* Video */}
+              <button
+                onClick={() => vidRef.current?.click()}
+                disabled={uploadingVideo}
+                className="flex-1 py-8 rounded-2xl flex flex-col items-center gap-3 transition-all"
+                style={{ background: videoUrl ? "rgba(123,77,255,0.1)" : "#0B0B0F", border: `1px dashed ${videoUrl ? "#7B4DFF" : "#22223A"}` }}
+              >
+                {uploadingVideo && !videoCover ? (
+                  <div className="w-7 h-7 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: "#7B4DFF", borderTopColor: "transparent" }} />
+                ) : videoUrl ? (
+                  <>
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#7B4DFF" strokeWidth="2" strokeLinecap="round">
+                      <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+                    </svg>
+                    <span className="text-sm" style={{ color: "#7B4DFF" }}>Vídeo enviado ✓</span>
+                  </>
+                ) : (
+                  <>
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2" strokeLinecap="round">
+                      <path d="M15 10l4.553-2.069A1 1 0 0121 8.87v6.26a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/>
+                    </svg>
+                    <span className="text-sm" style={{ color: "#6B7280" }}>Subir vídeo</span>
+                  </>
+                )}
+              </button>
+
+              {/* Cover/thumbnail */}
+              <button
+                onClick={() => coverRef.current?.click()}
+                disabled={uploadingVideo}
+                className="w-28 rounded-2xl overflow-hidden flex flex-col items-center justify-center gap-1 transition-all"
+                style={{ background: "#0B0B0F", border: `1px dashed ${videoCover ? "#7B4DFF" : "#22223A"}`, minHeight: 120 }}
+              >
+                {videoCover ? (
+                  <img src={videoCover} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  <>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2" strokeLinecap="round">
+                      <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>
+                    </svg>
+                    <span className="text-xs text-center" style={{ color: "#6B7280" }}>Capa (opcional)</span>
+                  </>
+                )}
+              </button>
             </div>
           </>
         )}
 
-        {isVideo && (
-          <>
-            <p className="text-xs font-semibold mb-3" style={{ color: "#9CA3AF" }}>ARQUIVO DE VÍDEO</p>
-            <input ref={vidRef} type="file" accept="video/*" onChange={(e) => setVideoName(e.target.files?.[0]?.name ?? "")} className="hidden" />
-            <button onClick={() => vidRef.current?.click()} className="w-full py-8 rounded-2xl flex flex-col items-center gap-3 mb-4 transition-all" style={{ background: videoName ? "rgba(123,77,255,0.1)" : "#0B0B0F", border: `1px dashed ${videoName ? "#7B4DFF" : "#22223A"}` }}>
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={videoName ? "#7B4DFF" : "#6B7280"} strokeWidth="2" strokeLinecap="round">
-                <path d="M15 10l4.553-2.069A1 1 0 0121 8.87v6.26a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/>
-              </svg>
-              <span className="text-sm" style={{ color: videoName ? "#7B4DFF" : "#6B7280" }}>
-                {videoName || "Clique para selecionar o vídeo"}
-              </span>
-            </button>
-          </>
-        )}
-
+        {/* Caption */}
         <p className="text-xs font-semibold mb-2" style={{ color: "#9CA3AF" }}>LEGENDA / DESCRIÇÃO</p>
-        <textarea value={caption} onChange={(e) => setCaption(e.target.value)} placeholder="Escreva a legenda que será publicada junto ao conteúdo..." rows={5} className="w-full px-4 py-3 rounded-xl text-sm resize-none outline-none mb-4" style={{ background: "#0B0B0F", border: "1px solid #22223A", color: "#fff" }} />
+        <textarea
+          value={caption}
+          onChange={(e) => setCaption(e.target.value)}
+          placeholder="Escreva a legenda que será publicada junto ao conteúdo..."
+          rows={5}
+          className="w-full px-4 py-3 rounded-xl text-sm resize-none outline-none mb-4"
+          style={{ background: "#0B0B0F", border: "1px solid #22223A", color: "#fff" }}
+        />
 
+        {/* Scheduled date */}
         <p className="text-xs font-semibold mb-2" style={{ color: "#9CA3AF" }}>DATA DE PUBLICAÇÃO (opcional)</p>
-        <input type="date" value={scheduledDate} onChange={(e) => setScheduledDate(e.target.value)} className="w-full px-4 py-3 rounded-xl text-sm outline-none" style={{ background: "#0B0B0F", border: "1px solid #22223A", color: "#fff" }} />
+        <input
+          type="date"
+          value={scheduledDate}
+          onChange={(e) => setScheduledDate(e.target.value)}
+          className="w-full px-4 py-3 rounded-xl text-sm outline-none"
+          style={{ background: "#0B0B0F", border: "1px solid #22223A", color: "#fff" }}
+        />
       </div>
 
-      <button onClick={submit} disabled={saving || (isImage && images.length === 0) || (isVideo && !videoName) || !caption.trim()} className="w-full py-4 rounded-2xl font-bold text-sm transition-all active:scale-[0.97] disabled:opacity-50" style={{ background: "#7B4DFF", color: "#fff" }}>
-        {saving ? "Enviando..." : "Enviar para revisão do cliente"}
+      {error && (
+        <div className="rounded-xl px-4 py-3 mb-4 text-sm" style={{ background: "#FF6B6B22", color: "#FF6B6B", border: "1px solid #FF6B6B44" }}>
+          {error}
+        </div>
+      )}
+
+      <button
+        onClick={submit}
+        disabled={saving || uploadingImages || uploadingVideo || (!isVideo && images.length === 0) || (isVideo && !videoUrl) || !caption.trim()}
+        className="w-full py-4 rounded-2xl font-bold text-sm transition-all active:scale-[0.97] disabled:opacity-50"
+        style={{ background: "#7B4DFF", color: "#fff" }}
+      >
+        {saving ? "Enviando..." : uploadingImages || uploadingVideo ? "Fazendo upload..." : "Enviar para revisão do cliente"}
       </button>
     </div>
   );

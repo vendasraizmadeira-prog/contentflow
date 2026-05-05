@@ -1,5 +1,6 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, type ReactElement } from "react";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 
 type Notif = {
@@ -12,138 +13,220 @@ type Notif = {
   created_at: string;
 };
 
-const typeIcons: Record<string, { icon: string; color: string }> = {
-  review:        { icon: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z", color: "#FBBF24" },
-  change_request:{ icon: "M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9", color: "#FF6B6B" },
-  recording:     { icon: "M15 10l4.553-2.069A1 1 0 0121 8.87v6.26a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z", color: "#FF6B6B" },
-  approved:      { icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z", color: "#22C55E" },
-  briefing:      { icon: "M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z", color: "#7B4DFF" },
-  general:       { icon: "M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z", color: "#9CA3AF" },
-};
-
-function relativeTime(iso: string): string {
+function timeAgo(iso: string) {
   const diff = Date.now() - new Date(iso).getTime();
   if (diff < 60000) return "agora";
-  if (diff < 3600000) return `há ${Math.floor(diff / 60000)} min`;
-  if (diff < 86400000) return `há ${Math.floor(diff / 3600000)}h`;
-  return new Date(iso).toLocaleDateString("pt-BR");
+  if (diff < 3600000) return `${Math.floor(diff / 60000)} min`;
+  if (diff < 86400000) return `${Math.floor(diff / 3600000)} h`;
+  const d = Math.floor(diff / 86400000);
+  return `${d} d`;
 }
 
-export default function Notificacoes() {
+const typeConfig: Record<string, { bg: string; icon: ReactElement }> = {
+  review: {
+    bg: "linear-gradient(135deg, #f9ce34, #ee2a7b)",
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
+        <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>
+      </svg>
+    ),
+  },
+  approved: {
+    bg: "linear-gradient(135deg, #4ade80, #16a34a)",
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
+        <path d="M20 6L9 17l-5-5"/>
+      </svg>
+    ),
+  },
+  change_request: {
+    bg: "linear-gradient(135deg, #fbbf24, #f59e0b)",
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
+        <circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>
+      </svg>
+    ),
+  },
+  recording: {
+    bg: "linear-gradient(135deg, #f87171, #dc2626)",
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
+        <path d="M15 10l4.553-2.069A1 1 0 0121 8.87v6.26a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/>
+      </svg>
+    ),
+  },
+  general: {
+    bg: "linear-gradient(135deg, #818cf8, #7B4DFF)",
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+    ),
+  },
+};
+
+export default function NotificacoesPage() {
   const [notifs, setNotifs] = useState<Notif[]>([]);
   const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState<{ avatar: string | null; name: string | null } | null>(null);
 
   useEffect(() => {
-    const load = async () => {
+    (async () => {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-      const { data } = await supabase
-        .from("notifications")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false })
-        .limit(60);
-      setNotifs(data ?? []);
+
+      const [{ data: notifData }, { data: profData }] = await Promise.all([
+        supabase
+          .from("notifications")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
+          .limit(60),
+        supabase.from("profiles").select("avatar,name").eq("id", user.id).single(),
+      ]);
+
+      setNotifs(notifData ?? []);
+      setProfile(profData);
       setLoading(false);
-    };
-    load();
+
+      // Mark all as read
+      if ((notifData ?? []).some((n) => !n.read)) {
+        await supabase
+          .from("notifications")
+          .update({ read: true })
+          .eq("user_id", user.id)
+          .eq("read", false);
+      }
+    })();
   }, []);
 
-  const markAll = async () => {
-    const supabase = createClient();
-    await supabase.from("notifications").update({ read: true }).eq("read", false);
-    setNotifs(notifs.map((n) => ({ ...n, read: true })));
-  };
+  const today = notifs.filter((n) => {
+    const d = new Date(n.created_at);
+    const now = new Date();
+    return d.toDateString() === now.toDateString();
+  });
+  const thisWeek = notifs.filter((n) => {
+    const d = new Date(n.created_at);
+    const now = new Date();
+    const diff = now.getTime() - d.getTime();
+    return diff < 7 * 86400000 && d.toDateString() !== now.toDateString();
+  });
+  const older = notifs.filter((n) => {
+    const d = new Date(n.created_at);
+    const now = new Date();
+    return now.getTime() - d.getTime() >= 7 * 86400000;
+  });
 
-  const markOne = async (id: string) => {
-    const supabase = createClient();
-    await supabase.from("notifications").update({ read: true }).eq("id", id);
-    setNotifs(notifs.map((n) => (n.id === id ? { ...n, read: true } : n)));
-  };
+  const NotifItem = ({ n }: { n: Notif }) => {
+    const cfg = typeConfig[n.type ?? "general"] ?? typeConfig.general;
+    const content = (
+      <div className="flex items-center gap-3 px-4 py-3">
+        {/* Agency avatar / icon */}
+        <div
+          className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0"
+          style={{ background: cfg.bg }}
+        >
+          {cfg.icon}
+        </div>
 
-  const now = new Date();
-  const today = notifs.filter((n) => new Date(n.created_at).toDateString() === now.toDateString());
-  const earlier = notifs.filter((n) => new Date(n.created_at).toDateString() !== now.toDateString());
-  const unreadCount = notifs.filter((n) => !n.read).length;
+        {/* Text */}
+        <div className="flex-1 min-w-0">
+          <p className="text-[13px] text-white leading-[1.4]">
+            <span className="font-semibold">Agência </span>
+            <span style={{ color: "rgba(255,255,255,0.85)" }}>{n.message || n.title}</span>
+          </p>
+          <p className="text-[12px] mt-0.5" style={{ color: "rgba(255,255,255,0.45)" }}>
+            {timeAgo(n.created_at)}
+            {!n.read && (
+              <span className="ml-2 inline-block w-2 h-2 rounded-full bg-blue-500 align-middle" />
+            )}
+          </p>
+        </div>
 
-  const NotifCard = ({ n, dimmed }: { n: Notif; dimmed?: boolean }) => {
-    const cfg = typeIcons[n.type ?? "general"] ?? typeIcons.general;
-    return (
-      <div
-        key={n.id}
-        onClick={() => markOne(n.id)}
-        className="rounded-2xl p-4 flex items-start gap-4 cursor-pointer transition-all"
-        style={{
-          background: n.read ? "#0F0F1E" : "rgba(212,255,63,0.06)",
-          border: `1px solid ${n.read ? "#22223A" : "rgba(212,255,63,0.2)"}`,
-          opacity: dimmed && n.read ? 0.6 : 1,
-        }}
-      >
-        <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: `${cfg.color}20` }}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={cfg.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d={cfg.icon} />
+        {/* Thumbnail */}
+        <div
+          className="w-11 h-11 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center"
+          style={{ background: "#222" }}
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="1.5" strokeLinecap="round">
+            <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>
           </svg>
         </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold">{n.title}</p>
-          {n.message && <p className="text-xs mt-0.5" style={{ color: "#9CA3AF" }}>{n.message}</p>}
-        </div>
-        <div className="flex items-center gap-2 flex-shrink-0">
-          <span className="text-xs" style={{ color: "#6B7280" }}>{relativeTime(n.created_at)}</span>
-          {!n.read && <div className="w-2 h-2 rounded-full" style={{ background: "#D4FF3F" }} />}
-        </div>
+      </div>
+    );
+
+    if (n.url) {
+      return <Link href={n.url}>{content}</Link>;
+    }
+    return <div>{content}</div>;
+  };
+
+  const Section = ({ title, items }: { title: string; items: Notif[] }) => {
+    if (items.length === 0) return null;
+    return (
+      <div className="mb-2">
+        <p className="px-4 py-2 text-[14px] font-bold text-white">{title}</p>
+        {items.map((n) => <NotifItem key={n.id} n={n} />)}
       </div>
     );
   };
 
   return (
-    <div className="p-6 max-w-2xl">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold">Notificações</h1>
-          <p className="text-sm mt-0.5" style={{ color: "#6B7280" }}>{unreadCount} não lidas</p>
-        </div>
-        {unreadCount > 0 && (
-          <button onClick={markAll} className="text-sm" style={{ color: "#D4FF3F" }}>Marcar todas como lidas</button>
-        )}
+    <div className="min-h-screen" style={{ background: "#000" }}>
+      {/* Header */}
+      <div
+        className="sticky top-0 z-20 flex items-center justify-between px-4"
+        style={{
+          height: 44,
+          background: "rgba(0,0,0,0.96)",
+          backdropFilter: "blur(20px)",
+          WebkitBackdropFilter: "blur(20px)",
+          borderBottom: "0.5px solid rgba(255,255,255,0.12)",
+        }}
+      >
+        <p className="text-[16px] font-bold text-white">Atividade</p>
+        <button>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round">
+            <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+          </svg>
+        </button>
       </div>
 
-      {loading && (
-        <div className="flex flex-col gap-2">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="rounded-2xl h-16 animate-pulse" style={{ background: "#0F0F1E" }} />
+      {loading ? (
+        <div className="flex flex-col gap-0 mt-2">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="flex items-center gap-3 px-4 py-3">
+              <div className="w-11 h-11 rounded-full animate-pulse" style={{ background: "#222" }} />
+              <div className="flex-1 flex flex-col gap-1.5">
+                <div className="h-3 w-48 rounded animate-pulse" style={{ background: "#222" }} />
+                <div className="h-2.5 w-16 rounded animate-pulse" style={{ background: "#222" }} />
+              </div>
+              <div className="w-11 h-11 rounded-lg animate-pulse" style={{ background: "#222" }} />
+            </div>
           ))}
         </div>
-      )}
-
-      {!loading && notifs.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-16 gap-3">
-          <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: "#0F0F1E" }}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4B5563" strokeWidth="2" strokeLinecap="round">
-              <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-            </svg>
+      ) : notifs.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-24 gap-4">
+          <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" />
+          </svg>
+          <div className="text-center">
+            <p className="text-white font-bold mb-1">Atividade sobre você</p>
+            <p className="text-sm" style={{ color: "rgba(255,255,255,0.45)" }}>
+              Quando sua agência enviar conteúdos,{"\n"}as notificações aparecerão aqui.
+            </p>
           </div>
-          <p className="font-semibold" style={{ color: "#6B7280" }}>Nenhuma notificação</p>
+        </div>
+      ) : (
+        <div className="mt-2">
+          <Section title="Hoje" items={today} />
+          <Section title="Esta semana" items={thisWeek} />
+          <Section title="Mais antigas" items={older} />
         </div>
       )}
 
-      {!loading && notifs.length > 0 && (
-        <div className="flex flex-col gap-2">
-          {today.length > 0 && (
-            <>
-              <p className="text-xs font-medium mb-1" style={{ color: "#6B7280" }}>HOJE</p>
-              {today.map((n) => <NotifCard key={n.id} n={n} />)}
-            </>
-          )}
-          {earlier.length > 0 && (
-            <>
-              <p className="text-xs font-medium mb-1 mt-4" style={{ color: "#6B7280" }}>MAIS CEDO</p>
-              {earlier.map((n) => <NotifCard key={n.id} n={n} dimmed />)}
-            </>
-          )}
-        </div>
-      )}
+      <div className="h-16" />
     </div>
   );
 }
