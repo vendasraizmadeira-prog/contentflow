@@ -25,6 +25,7 @@ export default function PerfilEditor() {
   const [bio, setBio] = useState("");
   const [website, setWebsite] = useState("");
   const [avatar, setAvatar] = useState("");
+  const [avatarUploading, setAvatarUploading] = useState(false);
   const [followers, setFollowers] = useState(0);
   const [following, setFollowing] = useState(0);
   const [posts, setPosts] = useState(0);
@@ -32,11 +33,8 @@ export default function PerfilEditor() {
 
   const [newHL, setNewHL] = useState("");
   const [newHLCover, setNewHLCover] = useState<string | null>(null);
-
-  // Track actual File objects for upload
-  const [avatarFile, setAvatarFile] = useState<File | null>(null);
-  const [hlCoverFiles, setHlCoverFiles] = useState<Record<string, File>>({});
-  const [newHLCoverFile, setNewHLCoverFile] = useState<File | null>(null);
+  const [newHLCoverUploading, setNewHLCoverUploading] = useState(false);
+  const [hlCoverUploading, setHlCoverUploading] = useState<string | null>(null);
 
   const avatarRef = useRef<HTMLInputElement>(null);
   const newHLCoverRef = useRef<HTMLInputElement>(null);
@@ -67,27 +65,56 @@ export default function PerfilEditor() {
     load();
   }, [id]);
 
-  const handleAvatar = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0];
-    if (f) {
-      setAvatar(URL.createObjectURL(f));
-      setAvatarFile(f);
-    }
-  };
-
-  const handleNewHLCover = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0];
-    if (f) {
-      setNewHLCover(URL.createObjectURL(f));
-      setNewHLCoverFile(f);
-    }
-  };
-
-  const handleHLCoverUpdate = (hlId: string, e: React.ChangeEvent<HTMLInputElement>) => {
+  // Upload avatar immediately on selection
+  const handleAvatar = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
     if (!f) return;
-    setHighlights((prev) => prev.map((h) => h.id === hlId ? { ...h, cover: URL.createObjectURL(f) } : h));
-    setHlCoverFiles((prev) => ({ ...prev, [hlId]: f }));
+    setAvatarUploading(true);
+    setSaveError("");
+    try {
+      const ext = f.type.split("/")[1] || "jpg";
+      const url = await uploadToStorage(f, `avatars/${id}_avatar.${ext}`);
+      setAvatar(url);
+    } catch (err) {
+      setSaveError(`Erro ao fazer upload da foto: ${(err as Error).message}`);
+    }
+    setAvatarUploading(false);
+    e.target.value = "";
+  };
+
+  // Upload new highlight cover immediately on selection
+  const handleNewHLCover = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    setNewHLCoverUploading(true);
+    setSaveError("");
+    try {
+      const ext = f.type.split("/")[1] || "jpg";
+      const tempId = `tmp_${Date.now()}`;
+      const url = await uploadToStorage(f, `highlights/${id}_${tempId}.${ext}`);
+      setNewHLCover(url);
+    } catch (err) {
+      setSaveError(`Erro ao fazer upload da capa: ${(err as Error).message}`);
+    }
+    setNewHLCoverUploading(false);
+    e.target.value = "";
+  };
+
+  // Upload highlight cover immediately on selection for existing highlights
+  const handleHLCoverUpdate = async (hlId: string, e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    setHlCoverUploading(hlId);
+    setSaveError("");
+    try {
+      const ext = f.type.split("/")[1] || "jpg";
+      const url = await uploadToStorage(f, `highlights/${id}_${hlId}.${ext}`);
+      setHighlights((prev) => prev.map((h) => h.id === hlId ? { ...h, cover: url } : h));
+    } catch (err) {
+      setSaveError(`Erro ao fazer upload da capa: ${(err as Error).message}`);
+    }
+    setHlCoverUploading(null);
+    e.target.value = "";
   };
 
   const addHL = () => {
@@ -95,52 +122,14 @@ export default function PerfilEditor() {
     const newId = `h${Date.now()}`;
     const cover = newHLCover ?? "https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=120&h=120&fit=crop";
     setHighlights([...highlights, { id: newId, title: newHL.trim(), cover }]);
-    if (newHLCoverFile) {
-      setHlCoverFiles((prev) => ({ ...prev, [newId]: newHLCoverFile }));
-    }
     setNewHL("");
     setNewHLCover(null);
-    setNewHLCoverFile(null);
   };
 
   const save = async () => {
     setSaving(true);
     setSaveError("");
     const supabase = createClient();
-
-    // Upload avatar if a new file was selected
-    let finalAvatar = avatar;
-    if (avatarFile) {
-      try {
-        const ext = avatarFile.type.split("/")[1] || "jpg";
-        finalAvatar = await uploadToStorage(avatarFile, `avatars/${id}_avatar.${ext}`);
-        setAvatar(finalAvatar);
-        setAvatarFile(null);
-      } catch {
-        setSaveError("Erro ao fazer upload da foto de perfil. Verifique se o bucket 'media' existe no Supabase Storage.");
-        setSaving(false);
-        return;
-      }
-    }
-
-    // Upload highlight covers for any that have new files
-    let finalHighlights = [...highlights];
-    for (const hl of finalHighlights) {
-      const file = hlCoverFiles[hl.id];
-      if (file) {
-        try {
-          const ext = file.type.split("/")[1] || "jpg";
-          const url = await uploadToStorage(file, `highlights/${id}_${hl.id}.${ext}`);
-          finalHighlights = finalHighlights.map((h) => h.id === hl.id ? { ...h, cover: url } : h);
-        } catch {
-          setSaveError("Erro ao fazer upload de imagem de destaque.");
-          setSaving(false);
-          return;
-        }
-      }
-    }
-    setHighlights(finalHighlights);
-    setHlCoverFiles({});
 
     const { error } = await supabase
       .from("profiles")
@@ -149,11 +138,11 @@ export default function PerfilEditor() {
         instagram: username ? `@${username.replace("@", "")}` : "",
         bio,
         website,
-        avatar: finalAvatar,
+        avatar,
         followers,
         following,
         posts,
-        highlights: finalHighlights,
+        highlights,
       })
       .eq("id", id);
 
@@ -167,6 +156,7 @@ export default function PerfilEditor() {
   };
 
   const bioLines = bio.split("\n");
+  const anyUploading = avatarUploading || newHLCoverUploading || !!hlCoverUploading;
 
   if (loading) {
     return (
@@ -189,7 +179,11 @@ export default function PerfilEditor() {
             <p className="text-xs font-semibold mb-3" style={{ color: "#9CA3AF" }}>FOTO DE PERFIL</p>
             <div className="flex items-center gap-4 mb-5">
               <div className="relative flex-shrink-0">
-                {avatar ? (
+                {avatarUploading ? (
+                  <div className="w-20 h-20 rounded-full flex items-center justify-center" style={{ background: "#0B0B0F", border: "2px solid #22223A" }}>
+                    <div className="w-6 h-6 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: "#7B4DFF", borderTopColor: "transparent" }} />
+                  </div>
+                ) : avatar ? (
                   <img src={avatar} alt="" className="w-20 h-20 rounded-full object-cover" style={{ border: "2px solid #22223A" }} />
                 ) : (
                   <div className="w-20 h-20 rounded-full flex items-center justify-center text-2xl font-bold" style={{ background: "#7B4DFF22", color: "#7B4DFF", border: "2px solid #22223A" }}>
@@ -204,7 +198,9 @@ export default function PerfilEditor() {
               <div>
                 <p className="text-sm font-medium">{displayName || "—"}</p>
                 <p className="text-xs mt-0.5" style={{ color: "#6B7280" }}>@{username || "handle"}</p>
-                <label htmlFor="avatar-input" className="text-xs mt-2 block cursor-pointer" style={{ color: "#7B4DFF" }}>Alterar foto</label>
+                <label htmlFor="avatar-input" className="text-xs mt-2 block cursor-pointer" style={{ color: avatarUploading ? "#6B7280" : "#7B4DFF" }}>
+                  {avatarUploading ? "Enviando..." : "Alterar foto"}
+                </label>
               </div>
             </div>
 
@@ -273,8 +269,12 @@ export default function PerfilEditor() {
                     <div key={h.id} className="flex flex-col items-center gap-1">
                       <div className="relative">
                         <label htmlFor={`hl-cover-${h.id}`} className="block cursor-pointer">
-                          <div className="w-14 h-14 rounded-full overflow-hidden" style={{ border: "2px solid #22223A" }}>
-                            <img src={h.cover} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                          <div className="w-14 h-14 rounded-full overflow-hidden flex items-center justify-center" style={{ border: "2px solid #22223A", background: "#0B0B0F" }}>
+                            {hlCoverUploading === h.id ? (
+                              <div className="w-5 h-5 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: "#7B4DFF", borderTopColor: "transparent" }} />
+                            ) : (
+                              <img src={h.cover} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                            )}
                           </div>
                           <div className="absolute bottom-0 right-0 w-5 h-5 rounded-full flex items-center justify-center" style={{ background: "#7B4DFF" }}>
                             <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3"/></svg>
@@ -307,7 +307,9 @@ export default function PerfilEditor() {
                     className="w-12 h-12 rounded-full flex items-center justify-center overflow-hidden cursor-pointer"
                     style={{ background: newHLCover ? "transparent" : "#0B0B0F", border: `2px dashed ${newHLCover ? "#7B4DFF" : "#22223A"}` }}
                   >
-                    {newHLCover ? (
+                    {newHLCoverUploading ? (
+                      <div className="w-5 h-5 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: "#7B4DFF", borderTopColor: "transparent" }} />
+                    ) : newHLCover ? (
                       <img src={newHLCover} alt="" className="w-full h-full object-cover rounded-full" />
                     ) : (
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2" strokeLinecap="round"><path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3"/></svg>
@@ -323,7 +325,12 @@ export default function PerfilEditor() {
                   className="flex-1 px-3 py-2.5 rounded-xl text-sm outline-none"
                   style={{ background: "#0B0B0F", border: "1px solid #22223A", color: "#fff" }}
                 />
-                <button onClick={addHL} className="px-4 py-2.5 rounded-xl text-sm font-semibold flex-shrink-0" style={{ background: "#7B4DFF", color: "#fff" }}>
+                <button
+                  onClick={addHL}
+                  disabled={!newHL.trim() || newHLCoverUploading}
+                  className="px-4 py-2.5 rounded-xl text-sm font-semibold flex-shrink-0 disabled:opacity-50"
+                  style={{ background: "#7B4DFF", color: "#fff" }}
+                >
                   Adicionar
                 </button>
               </div>
@@ -335,11 +342,11 @@ export default function PerfilEditor() {
             )}
             <button
               onClick={save}
-              disabled={saving}
+              disabled={saving || anyUploading}
               className="w-full py-3.5 rounded-2xl font-bold text-sm transition-all active:scale-[0.97] disabled:opacity-60"
               style={{ background: saved ? "#10B981" : "#7B4DFF", color: "#fff" }}
             >
-              {saving ? "Salvando..." : saved ? "✓ Perfil salvo e enviado ao cliente" : "Salvar e enviar para visualização"}
+              {anyUploading ? "Aguardando upload..." : saving ? "Salvando..." : saved ? "✓ Perfil salvo e enviado ao cliente" : "Salvar e enviar para visualização"}
             </button>
           </div>
         </div>
