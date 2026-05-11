@@ -1,7 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 type Highlight = { id: string; title: string; cover: string };
@@ -31,11 +30,10 @@ function formatNum(n: number) {
 }
 
 export default function PerfilPage() {
-  const router = useRouter();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [items, setItems] = useState<GridItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<"grid" | "reels">("grid");
+  const [tab, setTab] = useState<"grid" | "reels" | "tagged">("grid");
 
   useEffect(() => {
     (async () => {
@@ -72,7 +70,7 @@ export default function PerfilPage() {
   const highlights = profile?.highlights ?? [];
   const gridItems = items.filter((i) => i.type !== "reel");
   const reelItems = items.filter((i) => i.type === "reel");
-  const shownItems = tab === "grid" ? gridItems : reelItems;
+  const shownItems = tab === "grid" ? gridItems : tab === "reels" ? reelItems : [];
   const bioLines = (profile?.bio ?? "").split("\n");
 
   if (loading) {
@@ -112,13 +110,15 @@ export default function PerfilPage() {
           borderBottom: "0.5px solid rgba(255,255,255,0.12)",
         }}
       >
-        <button onClick={() => router.back()} className="md:hidden">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round">
-            <path d="M19 12H5M12 19l-7-7 7-7" />
+        {/* username + lock + chevron */}
+        <div className="flex items-center gap-1">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="white" className="flex-shrink-0">
+            <path d="M17 11V7a5 5 0 00-10 0v4H5a2 2 0 00-2 2v7a2 2 0 002 2h14a2 2 0 002-2v-7a2 2 0 00-2-2h-2z"/>
           </svg>
-        </button>
-        <div className="flex-1 text-center md:text-left md:pl-0">
-          <p className="text-[15px] font-bold text-white">{username}</p>
+          <p className="text-[15px] font-bold text-white mx-1">{username}</p>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
+            <path d="M6 9l6 6 6-6"/>
+          </svg>
         </div>
         <div className="flex items-center gap-5">
           <button>
@@ -136,16 +136,16 @@ export default function PerfilPage() {
 
       <div className="max-w-[935px] mx-auto">
         {/* Profile header */}
-        <div className="px-4 pt-4 pb-3">
-          <div className="flex items-center gap-6 mb-3">
+        <div className="px-4 pt-5 pb-3">
+          <div className="flex items-center gap-7 mb-3">
             {/* Avatar */}
             <div
-              className="rounded-full p-[3px] flex-shrink-0"
+              className="rounded-full p-[2px] flex-shrink-0"
               style={{ background: "linear-gradient(45deg, #f9ce34, #ee2a7b, #6228d7)" }}
             >
               <div
                 className="rounded-full overflow-hidden flex items-center justify-center"
-                style={{ width: 77, height: 77, background: "#111", border: "3px solid black" }}
+                style={{ width: 77, height: 77, background: "#111", border: "2px solid black" }}
               >
                 {profile?.avatar ? (
                   <img src={profile.avatar} alt="" className="w-full h-full object-cover" />
@@ -173,62 +173,62 @@ export default function PerfilPage() {
           </div>
 
           {/* Name + Bio */}
-          <div className="mb-2">
-            <p className="text-[13px] font-semibold text-white leading-tight">{profile?.name ?? username}</p>
+          <div className="mb-3">
+            <p className="text-[14px] font-bold text-white leading-tight">{profile?.name ?? username}</p>
             {profile?.bio && (
               <div className="mt-1">
                 {bioLines.map((line, i) => (
-                  <p key={i} className="text-[13px] text-white leading-[1.4]">{line || " "}</p>
+                  <p key={i} className="text-[14px] text-white leading-[1.4]">{line || " "}</p>
                 ))}
               </div>
             )}
             {profile?.website && (
-              <p className="text-[13px] font-semibold mt-1" style={{ color: "#E0F1FF" }}>
+              <p className="text-[14px] font-semibold mt-1" style={{ color: "#E0F1FF" }}>
                 {profile.website}
               </p>
             )}
           </div>
 
           {/* Action buttons */}
-          <div className="flex gap-2 mt-2">
+          <div className="flex gap-2">
             <button
-              className="flex-1 py-[7px] rounded-lg text-[13px] font-semibold text-white"
+              className="flex-1 py-[6px] rounded-lg text-[13px] font-semibold text-white"
               style={{ background: "#363636" }}
             >
               Contato
             </button>
             <button
-              className="flex-1 py-[7px] rounded-lg text-[13px] font-semibold text-white"
+              className="flex-1 py-[6px] rounded-lg text-[13px] font-semibold text-white"
               style={{ background: "#363636" }}
             >
               Seguindo
             </button>
             <button
-              className="py-[7px] px-3 rounded-lg"
+              className="py-[6px] px-3 rounded-lg"
               style={{ background: "#363636" }}
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
                 <path d="M6 9l6 6 6-6" />
               </svg>
             </button>
           </div>
         </div>
 
-        {/* Highlights */}
+        {/* Highlights — sem bordas separadoras, circulo 62px */}
         {highlights.length > 0 && (
           <div
-            className="flex gap-4 px-4 py-3 overflow-x-auto scrollbar-none"
-            style={{ borderTop: "0.5px solid rgba(255,255,255,0.12)", borderBottom: "0.5px solid rgba(255,255,255,0.12)" }}
+            className="flex gap-4 px-4 pt-2 pb-4 overflow-x-auto"
+            style={{ scrollbarWidth: "none" }}
           >
             {highlights.map((hl) => (
-              <div key={hl.id} className="flex flex-col items-center gap-1.5 flex-shrink-0">
+              <div key={hl.id} className="flex flex-col items-center gap-[6px] flex-shrink-0">
                 <div
                   className="rounded-full p-[2px]"
                   style={{ background: "linear-gradient(45deg, #f9ce34, #ee2a7b, #6228d7)" }}
                 >
                   <div
                     className="rounded-full overflow-hidden"
-                    style={{ width: 56, height: 56, border: "2px solid black", background: "#111" }}
+                    style={{ width: 62, height: 62, border: "2px solid black", background: "#111" }}
                   >
                     {hl.cover ? (
                       <img src={hl.cover} alt={hl.title} className="w-full h-full object-cover" />
@@ -239,38 +239,55 @@ export default function PerfilPage() {
                     )}
                   </div>
                 </div>
-                <p className="text-[11px] text-white text-center truncate" style={{ maxWidth: 64 }}>{hl.title}</p>
+                <p className="text-[11px] text-white text-center truncate" style={{ maxWidth: 72 }}>{hl.title}</p>
               </div>
             ))}
           </div>
         )}
 
         {/* Tabs */}
-        <div className="flex" style={{ borderBottom: "0.5px solid rgba(255,255,255,0.12)" }}>
+        <div className="flex" style={{ borderTop: "0.5px solid rgba(255,255,255,0.12)", borderBottom: "0.5px solid rgba(255,255,255,0.12)" }}>
           <button
             onClick={() => setTab("grid")}
-            className="flex-1 flex items-center justify-center py-3"
-            style={{ borderBottom: tab === "grid" ? "1px solid white" : "none" }}
+            className="flex-1 flex items-center justify-center py-[11px]"
+            style={{ borderBottom: tab === "grid" ? "1px solid white" : "1px solid transparent" }}
           >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill={tab === "grid" ? "white" : "none"} stroke={tab === "grid" ? "white" : "rgba(255,255,255,0.4)"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" />
-              <rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" />
+            <svg width="22" height="22" viewBox="0 0 24 24" fill={tab === "grid" ? "white" : "none"} stroke={tab === "grid" ? "white" : "rgba(255,255,255,0.45)"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+              <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
             </svg>
           </button>
           <button
             onClick={() => setTab("reels")}
-            className="flex-1 flex items-center justify-center py-3"
-            style={{ borderBottom: tab === "reels" ? "1px solid white" : "none" }}
+            className="flex-1 flex items-center justify-center py-[11px]"
+            style={{ borderBottom: tab === "reels" ? "1px solid white" : "1px solid transparent" }}
           >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill={tab === "reels" ? "white" : "none"} stroke={tab === "reels" ? "white" : "rgba(255,255,255,0.4)"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="2" y="2" width="20" height="20" rx="5" />
-              <path d="M17 12l-8-4.5v9L17 12z" fill={tab === "reels" ? "black" : "rgba(255,255,255,0.4)"} stroke="none" />
+            <svg width="22" height="22" viewBox="0 0 24 24" fill={tab === "reels" ? "white" : "none"} stroke={tab === "reels" ? "white" : "rgba(255,255,255,0.45)"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="2" y="2" width="20" height="20" rx="5"/>
+              <path d="M17 12l-8-4.5v9L17 12z" fill={tab === "reels" ? "black" : "rgba(255,255,255,0.45)"} stroke="none"/>
+            </svg>
+          </button>
+          <button
+            onClick={() => setTab("tagged")}
+            className="flex-1 flex items-center justify-center py-[11px]"
+            style={{ borderBottom: tab === "tagged" ? "1px solid white" : "1px solid transparent" }}
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={tab === "tagged" ? "white" : "rgba(255,255,255,0.45)"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/>
+              <line x1="7" y1="7" x2="7.01" y2="7" strokeWidth="2.5"/>
             </svg>
           </button>
         </div>
 
-        {/* Grid */}
-        {shownItems.length === 0 ? (
+        {/* Grid / Reels / Tagged */}
+        {tab === "tagged" ? (
+          <div className="flex flex-col items-center justify-center py-16 gap-3">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/>
+            </svg>
+            <p className="text-[14px]" style={{ color: "rgba(255,255,255,0.4)" }}>Nenhuma marcação ainda</p>
+          </div>
+        ) : shownItems.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 gap-3">
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="1.2" strokeLinecap="round">
               {tab === "grid"

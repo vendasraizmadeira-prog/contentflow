@@ -41,6 +41,7 @@ export default function AdminConteudos() {
   const [filter, setFilter] = useState("Todos");
   const [clientFilter, setClientFilter] = useState("all");
   const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -84,6 +85,15 @@ export default function AdminConteudos() {
 
   const isApproved = (item: ProducaoItem) =>
     item.status === "aprovado" || item.revisions.some((r) => r.type === "approved");
+
+  const deleteItem = async (id: string) => {
+    if (!confirm("Tem certeza que deseja excluir este conteúdo? Esta ação não pode ser desfeita.")) return;
+    setDeletingId(id);
+    const supabase = createClient();
+    const { error } = await supabase.from("producao_items").delete().eq("id", id);
+    if (!error) setItems(prev => prev.filter(item => item.id !== id));
+    setDeletingId(null);
+  };
 
   return (
     <div className="p-6 max-w-6xl">
@@ -175,6 +185,22 @@ export default function AdminConteudos() {
                       </span>
                     </div>
                   )}
+                  {/* Delete button */}
+                  <button
+                    onClick={() => deleteItem(item.id)}
+                    disabled={deletingId === item.id}
+                    className="absolute bottom-3 right-3 w-7 h-7 rounded-lg flex items-center justify-center transition-all hover:scale-110 disabled:opacity-50"
+                    style={{ background: "rgba(0,0,0,0.75)", backdropFilter: "blur(4px)" }}
+                    title="Excluir conteúdo"
+                  >
+                    {deletingId === item.id ? (
+                      <div className="w-3.5 h-3.5 border-2 rounded-full animate-spin" style={{ borderColor: "#EF4444", borderTopColor: "transparent" }}/>
+                    ) : (
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M3 6h18M8 6V4h8v2M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/>
+                      </svg>
+                    )}
+                  </button>
                 </div>
 
                 {/* Info */}
