@@ -12,6 +12,15 @@ const types = [
   { key: "story",    label: "Story",     icon: "M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" },
 ];
 
+async function uploadToStorage(file: File, clientId: string): Promise<string> {
+  const supabase = createClient();
+  const ext = file.name.split(".").pop() ?? "jpg";
+  const path = `producao/${clientId}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+  const { error } = await supabase.storage.from("media").upload(path, file, { upsert: false, contentType: file.type });
+  if (error) throw new Error(error.message);
+  return supabase.storage.from("media").getPublicUrl(path).data.publicUrl;
+}
+
 export default function NovoConteudo() {
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -22,6 +31,7 @@ export default function NovoConteudo() {
   const [caption, setCaption] = useState("");
   const [date, setDate] = useState("");
   const [saving, setSaving] = useState(false);
+  const [files, setFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
 
   useEffect(() => {
@@ -35,25 +45,58 @@ export default function NovoConteudo() {
 
   const handleFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = Array.from(e.target.files || []);
-    setPreviews(selected.map(f => URL.createObjectURL(f)));
+    setFiles(prev => [...prev, ...selected]);
+    setPreviews(prev => [...prev, ...selected.map(f => URL.createObjectURL(f))]);
+    e.target.value = "";
+  };
+
+  const removeFile = (idx: number) => {
+    setFiles(prev => prev.filter((_, i) => i !== idx));
+    setPreviews(prev => prev.filter((_, i) => i !== idx));
   };
 
   const submit = async (draft = false) => {
     if (!clientId || !title.trim()) return;
     setSaving(true);
-    const supabase = createClient();
-    await supabase.from("producao_items").insert({
-      client_id: clientId,
-      roteiro_title: title.trim(),
-      type,
-      post_subtype: type === "carousel" ? "carousel" : "single",
-      status: draft ? "aguardando" : "em_revisao",
-      images: previews,
-      caption: caption.trim(),
-      scheduled_date: date || null,
-    });
-    setSaving(false);
-    router.push("/admin/conteudos");
+    try {
+      const supabase = createClient();
+
+      const uploadedUrls = await Promise.all(files.map(f => uploadToStorage(f, clientId)));
+
+      let imageUrls: string[] = [];
+      let videoUrl: string | null = null;
+
+      if (type === "reel") {
+        files.forEach((f, i) => {
+          if (f.type.startsWith("video/")) {
+            videoUrl = uploadedUrls[i];
+          } else {
+            imageUrls.push(uploadedUrls[i]);
+          }
+        });
+      } else {
+        imageUrls = uploadedUrls;
+      }
+
+      await supabase.from("producao_items").insert({
+        client_id: clientId,
+        roteiro_title: title.trim(),
+        type,
+        post_subtype: type === "carousel" ? "carousel" : "single",
+        status: draft ? "aguardando" : "em_revisao",
+        images: imageUrls,
+        ...(videoUrl ? { video_url: videoUrl } : {}),
+        caption: caption.trim(),
+        scheduled_date: date || null,
+      });
+
+      router.push("/admin/conteudos");
+    } catch (err) {
+      console.error("Erro ao fazer upload:", err);
+      alert("Erro ao fazer upload das mídias. Verifique se o bucket 'media' existe no Supabase e tente novamente.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -96,8 +139,12 @@ export default function NovoConteudo() {
               <div className="grid grid-cols-3 gap-2">
                 {previews.map((p, i) => (
                   <div key={i} className="rounded-xl overflow-hidden aspect-square relative">
-                    <img src={p} alt="" className="w-full h-full object-cover"/>
-                    <button onClick={() => setPreviews(previews.filter((_, idx) => idx !== i))} className="absolute top-1 right-1 w-5 h-5 rounded-full flex items-center justify-center" style={{ background: "rgba(0,0,0,0.7)" }}>
+                    {files[i]?.type.startsWith("video/") ? (
+                      <video src={p} className="w-full h-full object-cover" muted playsInline/>
+                    ) : (
+                      <img src={p} alt="" className="w-full h-full object-cover"/>
+                    )}
+                    <button onClick={() => removeFile(i)} className="absolute top-1 right-1 w-5 h-5 rounded-full flex items-center justify-center" style={{ background: "rgba(0,0,0,0.7)" }}>
                       <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
                     </button>
                   </div>
@@ -136,10 +183,10 @@ export default function NovoConteudo() {
 
           <div className="flex gap-3">
             <button onClick={() => submit(true)} disabled={saving || !clientId || !title.trim()} className="flex-1 py-3 rounded-xl text-sm font-medium disabled:opacity-40" style={{ border: "1px solid #22223A", color: "#fff" }}>
-              {saving ? "Salvando..." : "Salvar rascunho"}
+              {saving ? "Enviando mídias..." : "Salvar rascunho"}
             </button>
             <button onClick={() => submit(false)} disabled={saving || !clientId || !title.trim()} className="flex-1 py-3 rounded-xl text-sm font-bold disabled:opacity-40" style={{ background: "#7B4DFF", color: "#fff" }}>
-              {saving ? "Enviando..." : "Enviar para revisão"}
+              {saving ? "Enviando mídias..." : "Enviar para revisão"}
             </button>
           </div>
         </div>
