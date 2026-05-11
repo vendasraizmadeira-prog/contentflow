@@ -17,6 +17,7 @@ type Content = {
   id: string;
   status: string;
   images: string[];
+  video_url: string | null;
   caption: string | null;
   revisions: Revision[];
   created_at: string;
@@ -52,14 +53,14 @@ export default function ReelDetailPage() {
       const [{ data: item }, { data: prof }] = await Promise.all([
         supabase
           .from("producao_items")
-          .select("id,status,images,caption,revisions,created_at")
+          .select("id,status,images,video_url,caption,revisions,created_at")
           .eq("id", id)
           .eq("client_id", user.id)
           .single(),
         supabase.from("profiles").select("name,instagram,avatar").eq("id", user.id).single(),
       ]);
 
-      if (item) setContent({ ...item, images: item.images ?? [], revisions: item.revisions ?? [] });
+      if (item) setContent({ ...item, images: item.images ?? [], video_url: item.video_url ?? null, revisions: item.revisions ?? [] });
       if (prof) { setProfile(prof); setUserName(prof.name ?? ""); }
       setLoading(false);
     })();
@@ -150,6 +151,7 @@ export default function ReelDetailPage() {
     );
   }
 
+  const videoUrl = content.video_url ?? "";
   const thumb = content.images[0] ?? "";
   const isApproved = content.status === "aprovado" || content.revisions.some((r) => r.type === "approved");
   const changeRequests = content.revisions.filter((r) => r.type === "change_request");
@@ -157,8 +159,18 @@ export default function ReelDetailPage() {
 
   return (
     <div style={{ height: "100dvh", background: "#000", position: "relative", overflow: "hidden" }}>
-      {/* Background */}
-      {thumb ? (
+      {/* Background — vídeo ou imagem */}
+      {videoUrl ? (
+        <video
+          src={videoUrl}
+          poster={thumb || undefined}
+          className="absolute inset-0 w-full h-full object-cover"
+          autoPlay
+          loop
+          muted
+          playsInline
+        />
+      ) : thumb ? (
         <img src={thumb} alt="" className="absolute inset-0 w-full h-full object-cover" />
       ) : (
         <div className="absolute inset-0 flex items-center justify-center" style={{ background: "#111" }}>

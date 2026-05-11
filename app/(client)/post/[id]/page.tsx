@@ -236,9 +236,9 @@ export default function PostPage() {
         </div>
 
         {/* Image */}
-        <div className="relative" style={{ aspectRatio: "1/1", background: "#111" }}>
+        <div className="relative w-full" style={{ background: "#000" }}>
           {images.length > 0 ? (
-            <img src={images[slide]} alt="" className="w-full h-full object-cover select-none" draggable={false} />
+            <img src={images[slide]} alt="" className="w-full block select-none" style={{ maxHeight: "125vw", objectFit: "contain" }} draggable={false} />
           ) : (
             <div className="w-full h-full flex flex-col items-center justify-center gap-3">
               <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="1.2" strokeLinecap="round">

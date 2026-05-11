@@ -90,6 +90,20 @@ export default function NovoConteudo() {
         scheduled_date: date || null,
       });
 
+      if (!draft) {
+        fetch("/api/notify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userId: clientId,
+            title: "Novo conteúdo disponível para revisão",
+            message: title.trim(),
+            type: "new_content",
+            url: "/dashboard",
+          }),
+        });
+      }
+
       router.push("/admin/conteudos");
     } catch (err) {
       console.error("Erro ao fazer upload:", err);

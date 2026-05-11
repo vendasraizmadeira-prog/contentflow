@@ -34,11 +34,11 @@ function LoginForm() {
     const { data: profile } = await supabase.from("profiles").select("role, briefing_completed").eq("id", data.user.id).single();
 
     if (profile?.role === "admin") {
-      router.push("/admin/dashboard");
+      window.location.href = "/admin/dashboard";
     } else if (profile?.briefing_completed === false) {
-      router.push("/briefing");
+      window.location.href = "/briefing";
     } else {
-      router.push("/dashboard");
+      window.location.href = "/dashboard";
     }
   };
 

@@ -1,4 +1,5 @@
 import { createAdminClient, createClient } from "@/lib/supabase/server";
+import { sendPush } from "@/lib/push";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -22,6 +23,7 @@ export async function POST(req: NextRequest) {
 
   if (targets.length === 0) return NextResponse.json({ ok: true });
 
+  // In-app notifications
   const rows = targets.map((uid) => ({
     user_id: uid,
     title,
@@ -29,8 +31,27 @@ export async function POST(req: NextRequest) {
     type: type ?? "general",
     url: url ?? null,
   }));
+  await supabase.from("notifications").insert(rows);
 
-  const { error } = await supabase.from("notifications").insert(rows);
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  // Push notifications
+  const { data: subs } = await supabase
+    .from("push_subscriptions")
+    .select("id, endpoint, p256dh, auth")
+    .in("user_id", targets);
+
+  const expiredIds: string[] = [];
+  await Promise.all(
+    (subs ?? []).map(async (sub) => {
+      const result = await sendPush(
+        { endpoint: sub.endpoint, p256dh: sub.p256dh, auth: sub.auth },
+        { title, body: message ?? "", url: url ?? "/" }
+      );
+      if (result === "expired") expiredIds.push(sub.id);
+    })
+  );
+  if (expiredIds.length > 0) {
+    await supabase.from("push_subscriptions").delete().in("id", expiredIds);
+  }
+
   return NextResponse.json({ ok: true });
 }

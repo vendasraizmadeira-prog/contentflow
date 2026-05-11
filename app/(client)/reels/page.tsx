@@ -7,6 +7,7 @@ type Reel = {
   id: string;
   status: string;
   images: string[];
+  video_url: string | null;
   caption: string | null;
   revisions: Revision[];
   created_at: string;
@@ -37,7 +38,7 @@ export default function ReelsPage() {
         supabase.from("profiles").select("name,instagram,avatar").eq("id", user.id).single(),
         supabase
           .from("producao_items")
-          .select("id,status,images,caption,revisions,created_at")
+          .select("id,status,images,video_url,caption,revisions,created_at")
           .eq("client_id", user.id)
           .eq("type", "reel")
           .in("status", ["em_revisao", "aprovado", "agendado"])
@@ -183,6 +184,7 @@ export default function ReelsPage() {
       {reels.map((reel, idx) => {
         const isApproved = reel.status === "aprovado" || reel.revisions.some((r) => r.type === "approved");
         const commentCount = reel.revisions.filter((r) => r.type === "change_request").length;
+        const videoUrl = reel.video_url ?? "";
         const thumb = reel.images[0] ?? "";
 
         return (
@@ -197,8 +199,18 @@ export default function ReelsPage() {
               background: "#000",
             }}
           >
-            {/* Background image/video */}
-            {thumb ? (
+            {/* Background — vídeo ou imagem */}
+            {videoUrl ? (
+              <video
+                src={videoUrl}
+                poster={thumb || undefined}
+                className="absolute inset-0 w-full h-full object-cover"
+                autoPlay
+                loop
+                muted
+                playsInline
+              />
+            ) : thumb ? (
               <img
                 src={thumb}
                 alt=""
