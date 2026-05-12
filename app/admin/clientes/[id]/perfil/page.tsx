@@ -6,10 +6,16 @@ import { createClient } from "@/lib/supabase/client";
 type Highlight = { id: string; title: string; cover: string };
 
 async function uploadToStorage(file: File, path: string): Promise<string> {
-  const supabase = createClient();
-  const { error } = await supabase.storage.from("media").upload(path, file, { upsert: true, contentType: file.type });
-  if (error) throw new Error(error.message);
-  return supabase.storage.from("media").getPublicUrl(path).data.publicUrl;
+  const form = new FormData();
+  form.append("file", file);
+  form.append("path", path);
+  const res = await fetch("/api/upload", { method: "POST", body: form });
+  if (!res.ok) {
+    const { error } = await res.json();
+    throw new Error(error ?? "Upload failed");
+  }
+  const { url } = await res.json();
+  return url;
 }
 
 export default function PerfilEditor() {
