@@ -1,9 +1,17 @@
-import { createAdminClient, createClient } from "@/lib/supabase/server";
+import { createClient as createServerClient } from "@/lib/supabase/server";
+import { createClient } from "@supabase/supabase-js";
 import { sendPush } from "@/lib/push";
 import { NextRequest, NextResponse } from "next/server";
 
+function adminClient() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+}
+
 export async function POST(req: NextRequest) {
-  const supabaseUser = await createClient();
+  const supabaseUser = await createServerClient();
   const { data: { user } } = await supabaseUser.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -11,7 +19,7 @@ export async function POST(req: NextRequest) {
   if (!title) return NextResponse.json({ error: "Missing title" }, { status: 400 });
   if (!userId && !targetRole) return NextResponse.json({ error: "Missing target" }, { status: 400 });
 
-  const supabase = await createAdminClient();
+  const supabase = adminClient();
 
   let targets: string[] = [];
   if (userId) {
@@ -24,14 +32,15 @@ export async function POST(req: NextRequest) {
   if (targets.length === 0) return NextResponse.json({ ok: true });
 
   // In-app notifications
-  const rows = targets.map((uid) => ({
-    user_id: uid,
-    title,
-    message: message ?? null,
-    type: type ?? "general",
-    url: url ?? null,
-  }));
-  await supabase.from("notifications").insert(rows);
+  await supabase.from("notifications").insert(
+    targets.map((uid) => ({
+      user_id: uid,
+      title,
+      message: message ?? null,
+      type: type ?? "general",
+      url: url ?? null,
+    }))
+  );
 
   // Push notifications
   const { data: subs } = await supabase
@@ -49,9 +58,10 @@ export async function POST(req: NextRequest) {
       if (result === "expired") expiredIds.push(sub.id);
     })
   );
+
   if (expiredIds.length > 0) {
     await supabase.from("push_subscriptions").delete().in("id", expiredIds);
   }
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, sent: subs?.length ?? 0 });
 }

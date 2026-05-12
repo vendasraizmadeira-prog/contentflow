@@ -42,6 +42,7 @@ export default function ReelDetailPage() {
   const [commentNote, setCommentNote] = useState("");
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState("");
+  const [muted, setMuted] = useState(true);
 
   useEffect(() => {
     (async () => {
@@ -161,15 +162,35 @@ export default function ReelDetailPage() {
     <div style={{ height: "100dvh", background: "#000", position: "relative", overflow: "hidden" }}>
       {/* Background — vídeo ou imagem */}
       {videoUrl ? (
-        <video
-          src={videoUrl}
-          poster={thumb || undefined}
-          className="absolute inset-0 w-full h-full object-cover"
-          autoPlay
-          loop
-          muted
-          playsInline
-        />
+        <>
+          <video
+            src={videoUrl}
+            poster={thumb || undefined}
+            className="absolute inset-0 w-full h-full object-cover"
+            autoPlay
+            loop
+            muted={muted}
+            playsInline
+          />
+          {/* Mute toggle */}
+          <button
+            onClick={() => setMuted(m => !m)}
+            className="absolute z-20 rounded-full flex items-center justify-center"
+            style={{ top: 14, right: 14, width: 32, height: 32, background: "rgba(0,0,0,0.55)" }}
+          >
+            {muted ? (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                <line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>
+              </svg>
+            ) : (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                <path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/>
+              </svg>
+            )}
+          </button>
+        </>
       ) : thumb ? (
         <img src={thumb} alt="" className="absolute inset-0 w-full h-full object-cover" />
       ) : (
