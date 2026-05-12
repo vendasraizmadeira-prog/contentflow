@@ -79,7 +79,7 @@ export default function PerfilEditor() {
     setSaveError("");
     try {
       const ext = f.type.split("/")[1] || "jpg";
-      const url = await uploadToStorage(f, `avatars/${id}_avatar.${ext}`);
+      const url = await uploadToStorage(f, `avatars/${id}_avatar_${Date.now()}.${ext}`);
       setAvatar(url);
     } catch (err) {
       setSaveError(`Erro ao fazer upload da foto: ${(err as Error).message}`);

@@ -370,7 +370,7 @@ export default function PerfilPage() {
                 const href = item.type === "reel" ? `/reels/${item.id}` : `/post/${item.id}`;
                 return (
                   <Link key={item.id} href={href}>
-                    <div className="relative" style={{ aspectRatio: "1/1", background: "#111" }}>
+                    <div className="relative" style={{ aspectRatio: "4/5", background: "#111" }}>
                       {thumb ? (
                         <img src={thumb} alt="" className="w-full h-full object-cover" />
                       ) : (
